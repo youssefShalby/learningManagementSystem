@@ -7,6 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+string dBConnectionString = builder.Configuration.GetConnectionString("LMS_Db");
+builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(dBConnectionString));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
