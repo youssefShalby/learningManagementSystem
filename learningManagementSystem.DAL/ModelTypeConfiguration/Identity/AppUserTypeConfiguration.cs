@@ -9,7 +9,7 @@ public class AppUserTypeConfiguration : IEntityTypeConfiguration<ApplicationUser
 		modelBuilder.HasKey(AU => AU.Id);
 		modelBuilder.Property(U => U.DisplayName).IsRequired().HasMaxLength(80);
 
-		modelBuilder.HasOne(U => U.Address).WithOne().HasForeignKey<Address>(A => A.AppUserId);
+		modelBuilder.HasOne(U => U.Address).WithOne().HasForeignKey<Address>(A => A.AppUserId).OnDelete(DeleteBehavior.Cascade);
 
 	}
 }

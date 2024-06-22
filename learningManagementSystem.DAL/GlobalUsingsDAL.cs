@@ -6,3 +6,5 @@ global using Microsoft.AspNetCore.Identity;
 global using learningManagementSystem.DAL.ModelTypeConfiguration;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
+global using learningManagementSystem.DAL.Queries;
+global using System.Linq.Expressions;

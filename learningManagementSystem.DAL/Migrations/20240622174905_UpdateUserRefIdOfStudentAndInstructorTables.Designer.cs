@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using learningManagementSystem.DAL;
 
@@ -11,9 +12,10 @@ using learningManagementSystem.DAL;
 namespace learningManagementSystem.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240622174905_UpdateUserRefIdOfStudentAndInstructorTables")]
+    partial class UpdateUserRefIdOfStudentAndInstructorTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,6 +303,7 @@ namespace learningManagementSystem.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserRefId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -364,14 +367,9 @@ namespace learningManagementSystem.DAL.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("StudentId");
 
                     b.ToTable("Orders");
                 });
@@ -383,6 +381,7 @@ namespace learningManagementSystem.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserRefId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -594,8 +593,7 @@ namespace learningManagementSystem.DAL.Migrations
                 {
                     b.HasOne("learningManagementSystem.DAL.Models.ApplicationUser", null)
                         .WithOne("Address")
-                        .HasForeignKey("learningManagementSystem.DAL.Models.Address", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("learningManagementSystem.DAL.Models.Address", "AppUserId");
 
                     b.HasOne("learningManagementSystem.DAL.Models.ApplicationUser", "AppUser")
                         .WithMany()
@@ -678,7 +676,9 @@ namespace learningManagementSystem.DAL.Migrations
                 {
                     b.HasOne("learningManagementSystem.DAL.Models.ApplicationUser", "AppUser")
                         .WithMany()
-                        .HasForeignKey("UserRefId");
+                        .HasForeignKey("UserRefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AppUser");
                 });
@@ -702,22 +702,16 @@ namespace learningManagementSystem.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("learningManagementSystem.DAL.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Course");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Student", b =>
                 {
                     b.HasOne("learningManagementSystem.DAL.Models.ApplicationUser", "AppUser")
                         .WithMany()
-                        .HasForeignKey("UserRefId");
+                        .HasForeignKey("UserRefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AppUser");
                 });

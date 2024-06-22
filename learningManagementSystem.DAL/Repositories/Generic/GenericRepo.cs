@@ -1,4 +1,5 @@
 ﻿
+
 namespace learningManagementSystem.DAL.Repositories;
 
 public class GenericRepo<T> : IGenericRepo<T> where T : class
