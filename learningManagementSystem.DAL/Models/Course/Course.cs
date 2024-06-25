@@ -6,6 +6,7 @@ public class Course : BaseModel<Guid>
     public string Description { get; set; } = string.Empty;
     public string Details { get; set; } = string.Empty;
     public decimal OriginalOrice { get; set; }
+    public string? ImgeUrl { get; set; }
     public decimal OfferOrice { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }

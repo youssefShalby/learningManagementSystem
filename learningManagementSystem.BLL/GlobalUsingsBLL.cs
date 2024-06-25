@@ -13,4 +13,5 @@ global using Microsoft.Extensions.Configuration;
 global using System.Text.Json;
 global using Microsoft.AspNetCore.Identity;
 global using System.Text.Json.Serialization;
-
+global using learningManagementSystem.BLL.Mappers;
+global using learningManagementSystem.DAL.Queries;

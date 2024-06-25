@@ -35,6 +35,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IStudentRepo, StudentRepo>();
 builder.Services.AddScoped<IInstructorRepo, InstructorRepo>();
 builder.Services.AddScoped<IRedisService, RedisService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>

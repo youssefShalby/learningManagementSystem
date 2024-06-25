@@ -17,7 +17,11 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 	public async Task<IEnumerable<Course>> GetAllWithQueryAsync(CourseQueryHandler query)
 	{
 		var courses = _context.Set<Course>().Where(C => C.IsDeleted == false).AsQueryable();
-		query.PageSize = int.Parse(_configuration["CustomConfiguration:CustomConfiguration"]);
+
+		if (query.PageSize <= 0)
+		{
+			query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : int.Parse(_configuration["CustomConfiguration:PageSize"]);
+		}
 
 		//> filter
 		if (!string.IsNullOrEmpty(query.Title))

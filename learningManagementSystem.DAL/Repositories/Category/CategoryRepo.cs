@@ -15,12 +15,16 @@ public class CategoryRepo : GenericRepo<Category>, ICategoryRepo
 	public async Task<IEnumerable<Category>> GetAllByQueryAsync(CategoryQueryHandler query)
 	{
 		var categories = _context.Set<Category>().AsNoTracking().AsQueryable();
-		query.PageSize = int.Parse(_configuration["CustomConfiguration:CustomConfiguration"]);
+
+		if(query.PageSize <= 0)
+		{
+			query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : int.Parse(_configuration["CustomConfiguration:PageSize"]);
+		}
 
 		//> Filter
 		if (!string.IsNullOrEmpty(query.Name))
 		{
-			categories = categories.Where(cat => cat.Name.Contains(query.Name));
+			categories = categories.Where(cat => cat.Name.Contains(query.Name) && cat.IsDeleted == false);
 		}
 
 		//> Sort
