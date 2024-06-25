@@ -1,3 +1,4 @@
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,10 +8,100 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+#region Option Pattern
+
+var smtpSettings = builder.Configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
+builder.Services.AddSingleton(smtpSettings);
+
+#endregion
+
+#region CustomServices
+
 string dBConnectionString = builder.Configuration.GetConnectionString("LMS_Db");
 builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(dBConnectionString));
 
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<ICommentRepo, CommentRepo>();
+builder.Services.AddScoped<ICourseRepo, CourseRepo>();
+builder.Services.AddScoped<ILessonRepo, LessonRepo>();
+builder.Services.AddScoped<IOrderRepo, OrderRepo>();
+builder.Services.AddScoped<IStudentCourseRepo, StudentCourseRepo>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IHandlerService, HandlerService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IStudentRepo, StudentRepo>();
+builder.Services.AddScoped<IInstructorRepo, InstructorRepo>();
+builder.Services.AddScoped<IRedisService, RedisService>();
+
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>
+{
+	option.Password.RequiredLength = 10;
+	option.Password.RequireUppercase = true;
+	option.Password.RequireDigit = true;
+
+	option.User.RequireUniqueEmail = true;
+	option.Lockout.MaxFailedAccessAttempts = 5;
+	option.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
+
+
+}).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+
+//> configure token life time which created by Asp 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(TokenOptions.DefaultEmailProvider, options =>
+{
+	options.TokenLifespan = TimeSpan.FromHours(1);
+});
+
+var result = builder.Services.AddAuthentication(option =>
+{
+	option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+	option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+	option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+
+});
+
+result.AddJwtBearer(option =>
+{
+	option.SaveToken = true;
+	option.RequireHttpsMetadata = false;
+
+	var theKey = builder.Configuration["JWT:tokenKey"];
+	var keyInBytes = Encoding.UTF8.GetBytes(theKey);
+	var key = new SymmetricSecurityKey(keyInBytes);
+
+	option.TokenValidationParameters = new TokenValidationParameters
+	{
+		ValidateIssuer = true,
+		ValidIssuer = builder.Configuration["JWT:issuer"],
+		ValidateAudience = true,
+		ValidAudience = builder.Configuration["JWT:audience"],
+		IssuerSigningKey = key
+	};
+});
+
+//> Roles of the System, Authorization Based Role
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("Admin", builder => builder.RequireClaim(ClaimTypes.Role, "Admin"));
+	options.AddPolicy("Instructor", builder => builder.RequireClaim(ClaimTypes.Role, "Admin", "Instructor"));
+	options.AddPolicy("Students", builder => builder.RequireClaim(ClaimTypes.Role, "Admin", "Instructor", "Student"));
+});
+
+
+
+
+#endregion
+
+
 var app = builder.Build();
+
+
+#region Middleware
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -26,3 +117,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+#endregion

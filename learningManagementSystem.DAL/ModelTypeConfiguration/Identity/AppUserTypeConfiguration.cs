@@ -9,7 +9,15 @@ public class AppUserTypeConfiguration : IEntityTypeConfiguration<ApplicationUser
 		modelBuilder.HasKey(AU => AU.Id);
 		modelBuilder.Property(U => U.DisplayName).IsRequired().HasMaxLength(80);
 
-		modelBuilder.HasOne(U => U.Address).WithOne().HasForeignKey<Address>(A => A.AppUserId).OnDelete(DeleteBehavior.Cascade);
+		modelBuilder.OwnsOne(U => U.Address, address =>
+		{
+			address.WithOwner();
+
+			address.Property(A => A.Street).IsRequired().HasMaxLength(40);
+			address.Property(A => A.City).IsRequired().HasMaxLength(50);
+			address.Property(A => A.State).IsRequired().HasMaxLength(80);
+			address.Property(A => A.ZipCode).IsRequired().HasMaxLength(20);
+		});
 
 	}
 }

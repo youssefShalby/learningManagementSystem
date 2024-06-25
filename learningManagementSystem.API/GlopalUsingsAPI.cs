@@ -1,2 +1,14 @@
 ﻿global using learningManagementSystem.DAL;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using learningManagementSystem.BLL.Service;
+global using learningManagementSystem.BLL.DTOs;
+global using E_Commerce.BLL.DTOs;
+global using learningManagementSystem.DAL.Models;
+global using learningManagementSystem.DAL.Repositories;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.IdentityModel.Tokens;
+global using System.Security.Claims;
+global using System.Text;

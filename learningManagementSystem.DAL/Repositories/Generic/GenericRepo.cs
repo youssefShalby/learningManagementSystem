@@ -12,7 +12,7 @@ public class GenericRepo<T> : IGenericRepo<T> where T : class
     {
 		_context = context;
 		_configuration = configuration;
-		pageSize = int.Parse(_configuration["CustomConfiguration:CustomConfiguration"]);
+		pageSize = int.Parse(_configuration["CustomConfiguration:PageSize"]);
 	}
     public async Task CreateAsync(T entity)
 	{
