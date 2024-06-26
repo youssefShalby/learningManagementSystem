@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using learningManagementSystem.DAL;
 
@@ -11,9 +12,10 @@ using learningManagementSystem.DAL;
 namespace learningManagementSystem.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240626124837_MakeCourseIdNullableInCommentModel")]
+    partial class MakeCourseIdNullableInCommentModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,7 +117,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Comment", b =>
@@ -149,7 +151,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("VideoId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.CommentReply", b =>
@@ -176,9 +178,11 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("CommentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
-                    b.ToTable("CommentReplies", (string)null);
+                    b.ToTable("CommentReplies");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Course", b =>
@@ -232,7 +236,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("InstructorId");
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.CourseAdvantage", b =>
@@ -253,7 +257,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CourseAdvantages", (string)null);
+                    b.ToTable("CourseAdvantages");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Instructor", b =>
@@ -269,7 +273,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("UserRefId");
 
-                    b.ToTable("Instructors", (string)null);
+                    b.ToTable("Instructors");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Lesson", b =>
@@ -299,7 +303,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Lessons", (string)null);
+                    b.ToTable("Lessons");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Order", b =>
@@ -335,7 +339,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Student", b =>
@@ -351,7 +355,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("UserRefId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.StudentCourse", b =>
@@ -374,7 +378,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentCourses", (string)null);
+                    b.ToTable("StudentCourses");
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Video", b =>
@@ -416,7 +420,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Videos", (string)null);
+                    b.ToTable("Videos");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -554,7 +558,7 @@ namespace learningManagementSystem.DAL.Migrations
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.ApplicationUser", b =>
                 {
-                    b.OwnsOne("learningManagementSystem.DAL.Models.ApplicationUser.Address#learningManagementSystem.DAL.Models.Address", "Address", b1 =>
+                    b.OwnsOne("learningManagementSystem.DAL.Models.Address", "Address", b1 =>
                         {
                             b1.Property<string>("ApplicationUserId")
                                 .HasColumnType("nvarchar(450)");
@@ -581,7 +585,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                             b1.HasKey("ApplicationUserId");
 
-                            b1.ToTable("AspNetUsers", (string)null);
+                            b1.ToTable("AspNetUsers");
 
                             b1.WithOwner()
                                 .HasForeignKey("ApplicationUserId");

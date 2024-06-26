@@ -22,6 +22,12 @@ public class VideoService : IVideoService
 
 		try
 		{
+			//> delete comments of video first
+			if(videoToDelete.Comments is not null)
+			{
+				_unitOfWork.CommentRepo.DeleteRange(videoToDelete.Comments);
+			}
+			
 			_unitOfWork.VideoRepo.Update(videoToDelete);
 			_unitOfWork.VideoRepo.SaveChanges();
 			return new CommonResponse("video deleted..!!", true);

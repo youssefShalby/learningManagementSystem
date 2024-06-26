@@ -5,6 +5,7 @@ public interface IUnitOfWork
 {
     ICategoryRepo CategoryRepo { get; }
     ICommentRepo CommentRepo { get; }
+    ICommentRelyRepo CommentRelyRepo { get; }
     ICourseRepo CourseRepo { get; }
     ILessonRepo LessonRepo { get; }
     IVideoRepo VideoRepo { get; }

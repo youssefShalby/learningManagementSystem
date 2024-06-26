@@ -33,6 +33,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IStudentRepo, StudentRepo>();
+builder.Services.AddScoped<ICommentRelyRepo, CommentRelyRepo>();
 builder.Services.AddScoped<IVideoRepo, VideoRepo>();
 builder.Services.AddScoped<ICourseAdvantegeRepo, CourseAdvantegeRepo>();
 builder.Services.AddScoped<IInstructorRepo, InstructorRepo>();
@@ -41,6 +42,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>

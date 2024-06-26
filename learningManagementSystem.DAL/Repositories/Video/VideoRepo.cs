@@ -15,7 +15,7 @@ public class VideoRepo : GenericRepo<Video>, IVideoRepo
 	public async Task<Video> GetByIdWithIncludesAsync(Guid id)
 	{
 		return await _context.Videos
-			.Include(V => V.Comments)
+			.Include(V => V.Comments!).ThenInclude(C => C.AppUser)
 			.Include(V => V.Lesson)
 			.FirstOrDefaultAsync(V => V.Id == id) ?? null!;
 	}

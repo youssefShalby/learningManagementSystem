@@ -3,7 +3,7 @@
 public class Comment : BaseModel<Guid>
 {
 	public string Content { get; set; } = string.Empty;
-	public DateTime CreatedAt { get; set; }
+	public DateTime CreatedAt { get; set; } = DateTime.Now;
 
 
 	[ForeignKey(nameof(AppUser))]
@@ -12,7 +12,7 @@ public class Comment : BaseModel<Guid>
 
 
 	[ForeignKey(nameof(Course))]
-    public Guid CourseId { get; set; }
+    public Guid? CourseId { get; set; }
     public Course? Course { get; set; }
 
 

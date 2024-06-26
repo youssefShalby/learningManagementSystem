@@ -12,14 +12,16 @@ public class CommentMapper
 			CreatedAt = comment.CreatedAt,
 			UserName = comment.AppUser?.DisplayName ?? "NA",
 			UserId = comment.UserId,
-			Replies = comment.Replies?.Select(relpy => new GetRepliesDto
+
+
+			/*Replies = comment.Replies?.Select(relpy => new GetRepliesDto
 			{
 				UserId = relpy.UserId,
 				Content = relpy.Content,
 				CreatedAt = relpy.CreatedAt,
 				UserName  = relpy.AppUser?.DisplayName ?? "NA"
 
-			}).ToList(),
+			}).ToList(),*/
 		};
 	}
 
@@ -31,6 +33,9 @@ public class CommentMapper
 			CreatedAt = comment.CreatedAt,
 			UserName = comment.AppUser?.DisplayName ?? "NA",
 			UserId = comment.UserId,
+
+
+			/*
 			Replies = comment.Replies?.Select(relpy => new GetRepliesDto
 			{
 				UserId = relpy.UserId,
@@ -38,7 +43,7 @@ public class CommentMapper
 				CreatedAt = relpy.CreatedAt,
 				UserName = relpy.AppUser?.DisplayName ?? "NA"
 
-			}).ToList(),
+			}).ToList(),*/
 		};
 	}
 }

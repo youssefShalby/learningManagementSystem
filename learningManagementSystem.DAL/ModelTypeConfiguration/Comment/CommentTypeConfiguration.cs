@@ -9,6 +9,12 @@ public class CommentTypeConfiguration : IEntityTypeConfiguration<Comment>
 		modelBuilder.HasKey(C => C.Id);
 		modelBuilder.Property(C => C.Content).IsRequired().HasMaxLength(250);
 		modelBuilder.Property(C => C.VideoId).IsRequired(false);
+		modelBuilder.Property(C => C.CourseId).IsRequired(false);
+		modelBuilder.Property(C => C.UserId).IsRequired(false);
+
+		modelBuilder.HasIndex(c => c.UserId).IsUnique(false);
+		modelBuilder.HasIndex(c => c.VideoId).IsUnique(false);
+		modelBuilder.HasIndex(c => c.CourseId).IsUnique(false);
 
 		modelBuilder.HasOne(c => c.AppUser).WithOne().HasForeignKey<Comment>(c => c.UserId).OnDelete(DeleteBehavior.NoAction);
 

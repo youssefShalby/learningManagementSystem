@@ -54,7 +54,7 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 	public async Task<Course> GetByIdWithIncludesAsync(Guid id)
 	{
 		return await _context.Set<Course>()
-			.Include(c => c.Comments)
+			.Include(c => c.Comments!).ThenInclude(c => c.AppUser)
 			.Include(c => c.Advanteges)
 			.Include(c => c.Category)
 			.Include(c => c.Instructor).ThenInclude(I => I!.AppUser)
