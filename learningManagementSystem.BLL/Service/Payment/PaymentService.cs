@@ -7,11 +7,13 @@ public class PaymentService : IPaymentService
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly StripeSettings _stripeSettings;
+	private readonly IEmailService _emailService;
 
-	public PaymentService(IUnitOfWork unitOfWork, StripeSettings stripeSettings)
+	public PaymentService(IUnitOfWork unitOfWork, StripeSettings stripeSettings, IEmailService emailService)
     {
 		_unitOfWork = unitOfWork;
 		_stripeSettings = stripeSettings;
+		_emailService = emailService;
 	}
 
     public async Task<BuyCourseDto> CreateOrUpdatePaymentIntentAsync(CreateOrUpdatePaymentDto model)
@@ -122,15 +124,21 @@ public class PaymentService : IPaymentService
 
 		int studentsNumber = _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id);
 
-		//> send email payment fail
+		//> send email payment fail or perform any logic
 
 		return CourseMapper.ToGetWithIncludesDto(course, studentsNumber);
 	}
 
-	public async Task<GetCourseWithIncludesDto> UpdateCourseWhenPaymentSuccessAsync(string paymentIntentId)
+	public async Task<GetCourseWithIncludesDto> UpdateCourseWhenPaymentSuccessAsync(string paymentIntentId, string userEmail)
 	{
 		var course = await _unitOfWork.CoursePaymentRepo.GetCoursePaymentIntentIdAsync(paymentIntentId);
 		if (course is null)
+		{
+			return null!;
+		}
+
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(userEmail);
+		if(user is null)
 		{
 			return null!;
 		}
@@ -139,7 +147,8 @@ public class PaymentService : IPaymentService
 		int studentsNumber =  _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id);
 
 		//> send email payment success
-		//> create order
+		var emailBody = _emailService.SuccessCourseOrderEmailBody(course, user.DisplayName);
+		await _emailService.SendEmailAsync(user.Email, "Course Purchase Success", emailBody, true);
 
 		return CourseMapper.ToGetWithIncludesDto(course, studentsNumber);
 

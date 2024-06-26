@@ -33,7 +33,7 @@ public class PaymentsController : ControllerBase
 	}
 
 	[HttpPost("webhook")]
-	public async Task<ActionResult> StripeWebHook()
+	public async Task<ActionResult> StripeWebHook([FromHeader] string userEmail)
 	{
 		var json = await new StreamReader(Request.Body).ReadToEndAsync();
 		var stripeSignature = Request.Headers["Stripe-Signature"];
@@ -54,7 +54,7 @@ public class PaymentsController : ControllerBase
 
 				intent = (PaymentIntent)stripeEvent.Data.Object;
 
-				course = await _paymentService.UpdateCourseWhenPaymentSuccessAsync(intent.Id);
+				course = await _paymentService.UpdateCourseWhenPaymentSuccessAsync(intent.Id, userEmail);
 				break;
 
 			case "payment_intent.payment_failed":

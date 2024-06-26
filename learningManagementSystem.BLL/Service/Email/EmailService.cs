@@ -139,5 +139,80 @@ public class EmailService : IEmailService
 ";
 	}
 
+	public string SuccessCourseOrderEmailBody(Course course, string UserName)
+    {
+        return @$"
 
+                <!DOCTYPE html>
+                <html lang=""en"">
+                <head>
+                <meta charset=""UTF-8"">
+                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                <title>Course Purchase Success</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        color: #333;
+                        margin: 0;
+                        padding: 0;
+                    }}
+                    .container {{
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #fff;
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }}
+                    .header {{
+                        background-color: #4caf50;
+                        color: #fff;
+                        padding: 10px 0;
+                        text-align: center;
+                        border-radius: 10px 10px 0 0;
+                    }}
+                    .content {{
+                        padding: 20px;
+                    }}
+                    .course-details {{
+                        margin: 20px 0;
+                    }}
+                    .footer {{
+                        background-color: #f4f4f4;
+                        color: #777;
+                        text-align: center;
+                        padding: 10px;
+                        border-radius: 0 0 10px 10px;
+                        font-size: 0.9em;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class=""container"">
+                    <div class=""header"">
+                        <h1>Course Purchase Success</h1>
+                    </div>
+                    <div class=""content"">
+                        <p>Dear {UserName},</p>
+                        <p>Congratulations! You have successfully purchased the course:</p>
+                        <div class=""course-details"">
+                            <h2>{course.Title}</h2>
+                            <p><strong>Instructor:</strong> {course.Instructor?.AppUser?.DisplayName ?? "Admin"} </p>
+                            <p><strong>Price:</strong> {course.OfferOrice} </p>
+                            <p><strong>students count :</strong> {course.StudentsNumber} </p>
+                        </div>
+                        <p>We hope you enjoy the course and find it valuable. If you have any questions or need support, please feel free to contact us.</p>
+                    </div>
+                    <div class=""footer"">
+                        <p>&copy; {DateTime.Now.Year} Dev:Youssef Shalaby. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+
+
+                ";
+    }
 }
