@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Stripe;
 
 namespace learningManagementSystem.API.Controllers;
@@ -21,21 +22,12 @@ public class PaymentsController : ControllerBase
 	}
 
 	[HttpPost("CreatePaymentIntent")]
-	public async Task<ActionResult> CreateOrUpdatePaymentIntent([FromHeader] Guid id)
+	public async Task<ActionResult> CreateOrUpdatePaymentIntent(CreateOrUpdatePaymentDto model)
 	{
-		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-		var email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "";
-
-		var bueryData = new BuyerDataDto
-		{
-			UserId = userId,
-			Email = email
-		};
-
-		var result = await _paymentService.CreateOrUpdatePaymentIntentAsync(id, bueryData);
+		var result = await _paymentService.CreateOrUpdatePaymentIntentAsync(model);
 		if(result is null)
 		{
-			return BadRequest("course or payment not found..!!");
+			return BadRequest("something went error..!!");
 		}
 		return Ok(result);
 	}

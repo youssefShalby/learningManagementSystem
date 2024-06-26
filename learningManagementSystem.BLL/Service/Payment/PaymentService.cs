@@ -7,31 +7,42 @@ public class PaymentService : IPaymentService
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly StripeSettings _stripeSettings;
-	private readonly IOrderService _orderServie;
 
-	public PaymentService(IUnitOfWork unitOfWork, StripeSettings stripeSettings, IOrderService orderService)
+	public PaymentService(IUnitOfWork unitOfWork, StripeSettings stripeSettings)
     {
 		_unitOfWork = unitOfWork;
 		_stripeSettings = stripeSettings;
-		_orderServie = orderService;
 	}
 
-    public async Task<BuyCourseDto> CreateOrUpdatePaymentIntentAsync(Guid coursePaymentId, BuyerDataDto model)
+    public async Task<BuyCourseDto> CreateOrUpdatePaymentIntentAsync(CreateOrUpdatePaymentDto model)
 	{
 
 		StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-		var coursePayment = await _unitOfWork.CoursePaymentRepo.GetByIdAsync(coursePaymentId);
+		//> get course payment to access the course which need to buy
+		var coursePayment = await _unitOfWork.CoursePaymentRepo.GetByIdAsync(model.CoursePaymentId);
 		if (coursePayment is null)
 		{
 			return null!;
 		}
-
 		var courseToBuy = await _unitOfWork.CourseRepo.GetByIdAsync(coursePayment.CourseId);
 		if (courseToBuy is null)
 		{
 			return null!;
 		}
+
+		//> get user by email to access the student which buy the course
+		var buyer = await _unitOfWork.UserManager.FindByEmailAsync(model.Email);
+		if(buyer is null)
+		{
+			return null!;
+		}
+		var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(buyer.Id);
+		if(student is null)
+		{
+			return null!;
+		}
+
 
 		PaymentIntentService service = new PaymentIntentService();
 		PaymentIntent intent = default!;
@@ -53,18 +64,39 @@ public class PaymentService : IPaymentService
 			_unitOfWork.CoursePaymentRepo.Update(coursePayment);
 			_unitOfWork.CoursePaymentRepo.SaveChanges();
 
+			//> create order after payment finish
+			var newOrder = new Order
+			{
+				Id = Guid.NewGuid(),
+				BuyerEmail = model.Email,
+				StudentId = student.Id,
+				CourseId = courseToBuy.Id,
+				Price = courseToBuy.OfferOrice,
+				CleintSecret = coursePayment.PaymentClientSecret,
+				PaymentIntentId = coursePayment.PaymentIntentId,
+				CreatedAt = DateTime.Now
+			};
+
+			await _unitOfWork.OrderRepo.CreateAsync(newOrder);
+			await _unitOfWork.OrderRepo.SaveChangesAsync();
+
 		}
 		else
 		{
 			var options = new PaymentIntentUpdateOptions
 			{
-				Amount = (long)courseToBuy.OfferOrice * 100
+				Amount = (long) courseToBuy.OfferOrice * 100
 			};
 
-			var orderToUpdate = new UpdateOrderDto
+			//> get order by paymentIntentId for update the price
+			var orderToUpdate = await _unitOfWork.OrderRepo.GetOrderByPaymentInetntIdAsync(coursePayment.PaymentIntentId);
+			if(orderToUpdate is not null)
 			{
-				Price = courseToBuy.OfferOrice
-			};
+				orderToUpdate.Price = courseToBuy.OfferOrice;
+
+				 _unitOfWork.OrderRepo.Update(orderToUpdate);
+				 _unitOfWork.OrderRepo.SaveChanges();
+			}
 
 			await service.UpdateAsync(coursePayment.PaymentIntentId, options);
 		}
@@ -107,6 +139,7 @@ public class PaymentService : IPaymentService
 		int studentsNumber =  _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id);
 
 		//> send email payment success
+		//> create order
 
 		return CourseMapper.ToGetWithIncludesDto(course, studentsNumber);
 

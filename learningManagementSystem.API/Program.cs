@@ -48,7 +48,6 @@ builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 

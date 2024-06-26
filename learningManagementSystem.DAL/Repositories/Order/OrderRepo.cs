@@ -37,4 +37,9 @@ public class OrderRepo : GenericRepo<Order>, IOrderRepo
 			.Include(O => O.Course)
 			.FirstOrDefaultAsync(O => O.Id == id) ?? null!;
 	}
+
+	public async Task<Order> GetOrderByPaymentInetntIdAsync(string paymentIntentId)
+	{
+		return await _context.Orders.FirstOrDefaultAsync(o => o.PaymentIntentId == paymentIntentId) ?? null!;
+	}
 }

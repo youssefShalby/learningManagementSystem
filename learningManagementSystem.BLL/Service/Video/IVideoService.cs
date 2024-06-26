@@ -8,5 +8,5 @@ public interface IVideoService
 	Task<CommonResponse> UpdateVideoAsync(Guid id, UpdateVideoDto model);
 	Task<CommonResponse> DeleteVideoAsync(Guid id);
 	Task<GetVideoByIdWithIncludesDto> GetByIdWithIncludes(Guid id);
-	Task<CommonResponse> LockOrUnlockAsync(Guid id)
+	Task<CommonResponse> LockOrUnlockAsync(Guid id);
 }
