@@ -17,16 +17,7 @@ public class CategoryMapper
 		return new GetCategoryByIdWithIncludesDto
 		{
 			Name = model.Name,
-			Courses = model.Courses?.Select(course => new GetCourseWithCategoryDto
-			{
-				Description = course.Description,
-				ImgeUrl = course.ImgeUrl,
-				OfferOrice = course.OfferOrice,
-				OriginalOrice = course.OriginalOrice,
-				StudentsNumber = course.StudentsNumber,
-				Title = course.Title
-
-			}).ToList()
+			Courses = model.Courses?.Select(course => CourseMapper.ToGetDto(course)).ToList()
 		};
 	}
 }

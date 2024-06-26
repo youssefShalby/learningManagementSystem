@@ -61,7 +61,7 @@ public class CategoryService : ICategoryService
 		var catgories = await _unitOfWork.CategoryRepo.GetAllAsync(pageNumber);
 		if(catgories is null)
 		{
-			return new List<GetCategoryToShowDto>();
+			return null!;
 		}
 
 		catgories = catgories.Where(cat => cat.IsDeleted == false).ToList();
@@ -75,7 +75,7 @@ public class CategoryService : ICategoryService
 		var catgories = await _unitOfWork.CategoryRepo.GetAllByQueryAsync(query);
 		if (catgories is null)
 		{
-			return new List<GetCategoryToShowDto>();
+			return null!;
 		}
 
 		catgories = catgories.Where(cat => cat.IsDeleted == false);
@@ -88,7 +88,7 @@ public class CategoryService : ICategoryService
 		var category = await _unitOfWork.CategoryRepo.GetByIdWithIncludesAsync(id);
 		if(category is null || category.IsDeleted)
 		{
-			return new GetCategoryByIdWithIncludesDto();
+			return null!;
 		}
 
 		return CategoryMapper.ToCategoryWithCourseDto(category);

@@ -7,18 +7,49 @@ namespace learningManagementSystem.DAL.Repositories;
 public class StudentCourseRepo : GenericRepo<StudentCourse>, IStudentCourseRepo
 {
 	private readonly AppDbContext _context;
+	private readonly IConfiguration _configuration;
 
 	public StudentCourseRepo(AppDbContext context, IConfiguration configuration) : base(context, configuration)
     {
 		_context = context;
+		_configuration = configuration;
 	}
 
 
-	public async Task<IEnumerable<Course>> GetStudentCoursesAsync(ApplicationUser user)
+	public async Task<IEnumerable<Course>> GetStudentCoursesAsync(CourseQueryHandler query, string userId)
 	{
 		try
 		{
-			var portfolio = _context.StudentCourses.Where(SC => SC.Student!.UserRefId == user.Id);
+			var portfolio = _context.StudentCourses.Where(SC => SC.Student!.Id.ToString() == userId && SC.Course!.IsDeleted == false);
+
+			if (!string.IsNullOrEmpty(query.Title))
+			{
+				portfolio = portfolio.Where(c => c.Course!.Title.Contains(query.Title));
+			}
+
+			if (!string.IsNullOrEmpty(query.SortBy))
+			{
+				if (query.SortBy.Equals("date"))
+				{
+					portfolio = query.IsDescending ? portfolio.OrderByDescending(c => c.Course!.CreatedAt) : portfolio.OrderBy(c => c.Course!.CreatedAt);
+				}
+
+				if (query.SortBy.Equals("price"))
+				{
+					portfolio = query.IsDescending ? portfolio.OrderByDescending(c => c.Course!.OfferOrice) : portfolio.OrderBy(c => c.Course!.OfferOrice);
+				}
+
+				if (query.SortBy.Equals("title"))
+				{
+					portfolio = query.IsDescending ? portfolio.OrderByDescending(c => c.Course!.Title) : portfolio.OrderBy(c => c.Course!.Title);
+				}
+			}
+
+			if (query.PageSize <= 0)
+			{
+				query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : int.Parse(_configuration["CustomConfiguration:PageSize"]);
+			}
+
 			var courses = await portfolio.Select(course => new Course
 			{
 				Id = course.CourseId,

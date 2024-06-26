@@ -56,15 +56,48 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 		return await _context.Set<Course>()
 			.Include(c => c.Comments)
 			.Include(c => c.Advanteges)
+			.Include(c => c.Category)
+			.Include(c => c.Instructor).ThenInclude(I => I!.AppUser)
 			.Include(c => c.Lessons!).ThenInclude(L => L.Videos)
 			.FirstOrDefaultAsync(c => c.Id == id) ?? null!;
 	}
 
-	public async Task<IEnumerable<Course>> GetInstructorCoursesAsync(ApplicationUser user)
+	public async Task<IEnumerable<Course>> GetInstructorCoursesAsync(CourseQueryHandler query, string userId)
 	{
 		try
 		{
-			var portfolio = _context.Courses.Where(C => C.Instructor!.UserRefId == user.Id);
+			var portfolio = _context.Courses.Where(C => C.Instructor!.Id.ToString() == userId && C.IsDeleted == false);
+
+			if (!string.IsNullOrEmpty(query.Title))
+			{
+				portfolio = portfolio.Where(c => c.Title.Contains(query.Title));
+			}
+
+			if (!string.IsNullOrEmpty(query.SortBy))
+			{
+				if (query.SortBy.Equals("date"))
+				{
+					portfolio = query.IsDescending ? portfolio.OrderByDescending(c => c.CreatedAt) : portfolio.OrderBy(c => c.CreatedAt);
+				}
+
+				if (query.SortBy.Equals("price"))
+				{
+					portfolio = query.IsDescending ? portfolio.OrderByDescending(c => c.OfferOrice) : portfolio.OrderBy(c => c.OfferOrice);
+				}
+
+				if (query.SortBy.Equals("title"))
+				{
+					portfolio = query.IsDescending ? portfolio.OrderByDescending(c => c.Title) : portfolio.OrderBy(c => c.Title);
+				}
+			}
+
+			if (query.PageSize <= 0)
+			{
+				query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : int.Parse(_configuration["CustomConfiguration:PageSize"]);
+			}
+
+			portfolio = portfolio.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize);
+
 			var courses = await portfolio.Select(course => new Course
 			{
 				Id = course.Id,

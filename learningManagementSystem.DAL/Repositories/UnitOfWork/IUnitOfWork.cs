@@ -7,9 +7,11 @@ public interface IUnitOfWork
     ICommentRepo CommentRepo { get; }
     ICourseRepo CourseRepo { get; }
     ILessonRepo LessonRepo { get; }
+    IVideoRepo VideoRepo { get; }
     IOrderRepo OrderRepo { get; }
     IStudentRepo StudentRepo { get; }
     IInstructorRepo InstructorRepo { get; }
+    ICourseAdvantegeRepo CourseAdvantegeRepo { get; }
 
     IStudentCourseRepo StudentCourseRepo { get; }
 
