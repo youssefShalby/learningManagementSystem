@@ -5,6 +5,7 @@ public class Order : BaseModel<Guid>
 {
     public string BuyerEmail { get; set; } = string.Empty;
     public decimal Price { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [ForeignKey(nameof(Course))]
     public Guid CourseId { get; set; }

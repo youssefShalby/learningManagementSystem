@@ -12,8 +12,7 @@ public class Course : BaseModel<Guid>
     public bool IsDeleted { get; set; }
     public int StudentsNumber { get; set; }
 
-
-    [ForeignKey(nameof(Category))]
+	[ForeignKey(nameof(Category))]
     public Guid? CategoryId { get; set; }
     public Category? Category { get; set; }
 
@@ -26,4 +25,5 @@ public class Course : BaseModel<Guid>
     public ICollection<Comment>? Comments { get; set; }
     public ICollection<Lesson>? Lessons { get; set; }
     public ICollection<StudentCourse>? StudentCourses { get; set; }
+    public ICollection<CoursePayment>? CoursePayments { get; set; }
 }

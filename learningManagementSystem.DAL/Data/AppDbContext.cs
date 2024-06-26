@@ -20,6 +20,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 	public DbSet<CommentReply> CommentReplies => Set<CommentReply>();
 	public DbSet<Student> Students => Set<Student>();
 	public DbSet<Instructor> Instructors => Set<Instructor>();
+	public DbSet<CoursePayment> CoursePayments=> Set<CoursePayment>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
@@ -42,6 +43,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 		new LessonTypeConfiguration().Configure(modelBuilder.Entity<Lesson>());
 		new VideoTypeConfiguration().Configure(modelBuilder.Entity<Video>());
 		new StudentCourseTypeConfiguration().Configure(modelBuilder.Entity<StudentCourse>());
+		new CoursePaymentTypeConfiguration().Configure(modelBuilder.Entity<CoursePayment>());
 
 
 		//> many to many relationships

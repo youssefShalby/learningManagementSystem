@@ -77,6 +77,19 @@ public class StudentCourseRepo : GenericRepo<StudentCourse>, IStudentCourseRepo
 		}
 	}
 
+	public int GetStudentsNumber(Guid courseId)
+	{
+		try
+		{
+			var courseRepeat = _context.StudentCourses.Where(SC => SC.CourseId == courseId && SC.StudentId != null);
+			return courseRepeat.Count();
+		}
+		catch
+		{
+			return 0;
+		}
+	}
+
 	//> Enroll User to course => Handle in BLL layer by Create method which in Generic repo
 	//> Out User from course => Handle in BLL layer by Delete method which in Generic repo
 }

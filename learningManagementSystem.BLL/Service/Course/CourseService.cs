@@ -82,7 +82,7 @@ public class CourseService : ICourseService
 			return null!;
 		}
 
-		return CourseMapper.ToGetWithIncludesDto(course);
+		return CourseMapper.ToGetWithIncludesDto(course, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id));
 	}
 
 	public async Task<IEnumerable<GetCourseWithCategoryDto>> GetInstructorCoursesAsync(CourseQueryHandler query, string userId)

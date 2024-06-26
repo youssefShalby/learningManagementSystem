@@ -9,6 +9,7 @@ public class UploadVideoDto
 	public string Length { get; set; } = string.Empty;
 	public string Description { get; set; } = string.Empty;
 	public string FileFormat { get; set; } = string.Empty;
+	public bool IsLocked { get; set; } = true;
 	public DateTime UploadDate { get; set; } = DateTime.Now;
 	public Guid LessonId { get; set; }
 

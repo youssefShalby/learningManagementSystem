@@ -13,6 +13,9 @@ builder.Services.AddSwaggerGen();
 var smtpSettings = builder.Configuration.GetSection("SmtpSettings").Get<SmtpSettings>();
 builder.Services.AddSingleton(smtpSettings);
 
+var stripeSettings = builder.Configuration.GetSection("StripeSettings").Get<StripeSettings>();
+builder.Services.AddSingleton(stripeSettings);
+
 #endregion
 
 #region CustomServices
@@ -23,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(dBConn
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<ICommentRepo, CommentRepo>();
 builder.Services.AddScoped<ICourseRepo, CourseRepo>();
+builder.Services.AddScoped<ICoursePaymentRepo, CoursePaymentRepo>();
 builder.Services.AddScoped<ILessonRepo, LessonRepo>();
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IStudentCourseRepo, StudentCourseRepo>();
@@ -44,6 +48,9 @@ builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>

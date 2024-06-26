@@ -9,6 +9,7 @@ public class Video : BaseModel<Guid>
     public string Length  { get; set; } = string.Empty;
     public string Description  { get; set; } = string.Empty;
     public string FileFormat  { get; set; } = string.Empty;
+    public bool IsLocked { get; set; }
     public DateTime UploadDate { get; set; } = DateTime.Now;
 
 

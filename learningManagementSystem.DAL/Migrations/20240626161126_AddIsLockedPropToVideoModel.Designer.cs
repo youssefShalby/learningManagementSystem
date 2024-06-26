@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using learningManagementSystem.DAL;
 
@@ -11,9 +12,10 @@ using learningManagementSystem.DAL;
 namespace learningManagementSystem.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240626161126_AddIsLockedPropToVideoModel")]
+    partial class AddIsLockedPropToVideoModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,30 +258,6 @@ namespace learningManagementSystem.DAL.Migrations
                     b.ToTable("CourseAdvantages");
                 });
 
-            modelBuilder.Entity("learningManagementSystem.DAL.Models.CoursePayment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PaymentClientSecret")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentIntentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("CoursePayments");
-                });
-
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Instructor", b =>
                 {
                     b.Property<Guid>("Id")
@@ -342,9 +320,6 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentIntentId")
                         .IsRequired()
@@ -690,15 +665,6 @@ namespace learningManagementSystem.DAL.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("learningManagementSystem.DAL.Models.CoursePayment", b =>
-                {
-                    b.HasOne("learningManagementSystem.DAL.Models.Course", null)
-                        .WithMany("CoursePayments")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Instructor", b =>
                 {
                     b.HasOne("learningManagementSystem.DAL.Models.ApplicationUser", "AppUser")
@@ -852,8 +818,6 @@ namespace learningManagementSystem.DAL.Migrations
                     b.Navigation("Advanteges");
 
                     b.Navigation("Comments");
-
-                    b.Navigation("CoursePayments");
 
                     b.Navigation("Lessons");
 

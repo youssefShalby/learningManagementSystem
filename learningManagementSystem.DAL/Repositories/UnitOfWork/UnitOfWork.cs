@@ -9,6 +9,7 @@ public class UnitOfWork : IUnitOfWork
 	public ICommentRepo CommentRepo { get; }
 	public ICommentRelyRepo CommentRelyRepo { get; }
 	public ICourseRepo CourseRepo { get; }
+	public ICoursePaymentRepo CoursePaymentRepo { get; }
 	public ILessonRepo LessonRepo { get; }
 	public IVideoRepo VideoRepo { get; }
 	public IOrderRepo OrderRepo { get; }
@@ -25,7 +26,7 @@ public class UnitOfWork : IUnitOfWork
 			IOrderRepo orderRepo, IStudentCourseRepo studentCourseRepo,
 			RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IConfiguration configuration, 
 			IStudentRepo studentRepo, IInstructorRepo instructorRepo, ICourseAdvantegeRepo courseAdvantegeRepo, IVideoRepo videoRepo,
-			ICommentRelyRepo commentRelyRepo
+			ICommentRelyRepo commentRelyRepo, ICoursePaymentRepo coursePaymentRepo
 		)
     {
         CategoryRepo = categoryRepo;
@@ -42,5 +43,6 @@ public class UnitOfWork : IUnitOfWork
 		CourseAdvantegeRepo = courseAdvantegeRepo;
 		VideoRepo = videoRepo;
 		CommentRelyRepo = commentRelyRepo;
+		CoursePaymentRepo = coursePaymentRepo;
     }
 }

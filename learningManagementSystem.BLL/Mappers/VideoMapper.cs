@@ -12,6 +12,7 @@ public class VideoMapper
 			Title = video.Title,
 			UploadDate = video.UploadDate,
 			Url = video.Url,
+			IsLocked = video.IsLocked,
 		};
 	}
 
@@ -27,6 +28,7 @@ public class VideoMapper
 			Id = Guid.NewGuid(),
 			LessonId = video.LessonId,
 			FileFormat = video.FileFormat,
+			IsLocked = true
 		};
 	}
 	

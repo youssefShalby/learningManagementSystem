@@ -17,7 +17,7 @@ public class CourseMapper
 		};
 	}
 
-	public static GetCourseWithIncludesDto ToGetWithIncludesDto(Course course)
+	public static GetCourseWithIncludesDto ToGetWithIncludesDto(Course course, int studentNumbers)
 	{
 		return new GetCourseWithIncludesDto
 		{
@@ -25,7 +25,7 @@ public class CourseMapper
 			ImgeUrl = course.ImgeUrl,
 			OfferOrice = course.OfferOrice,
 			OriginalOrice = course.OriginalOrice,
-			StudentsNumber = course.StudentsNumber,
+			StudentsNumber = studentNumbers,
 			Title = course.Title,
 			CategoryName = course.Category?.Name ?? "NA",
 			Details = course.Details,

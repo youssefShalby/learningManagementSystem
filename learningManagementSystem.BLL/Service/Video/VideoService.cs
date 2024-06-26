@@ -61,6 +61,7 @@ public class VideoService : IVideoService
 		{
 			videoToUpdate.Title = model.Title;
 			videoToUpdate.Description = model.Description;
+			videoToUpdate.IsLocked = model.IsLocked;
 
 			_unitOfWork.VideoRepo.Update(videoToUpdate);
 			_unitOfWork.VideoRepo.SaveChanges();

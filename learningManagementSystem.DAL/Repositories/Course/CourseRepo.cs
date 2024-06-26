@@ -125,4 +125,24 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 			return null!;
 		}
 	}
+
+	public async Task UnlockCourseVideosAsync(Guid id)
+	{
+		var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
+
+		if(course?.Lessons is not null)
+		{
+			foreach (var lesson in course?.Lessons!)
+			{
+				if (lesson.Videos is null) continue;
+				foreach (var video in lesson.Videos)
+				{
+					video.IsLocked = false;
+				}
+			}
+		}
+
+		//> save changes after it direct
+		await _context.SaveChangesAsync();
+	}
 }
