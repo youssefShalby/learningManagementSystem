@@ -15,7 +15,7 @@ public class VideosController : ControllerBase
 	}
 
 	[HttpGet("GetVideo")]
-	public async Task<ActionResult> GetVideo(Guid id)
+	public async Task<ActionResult> GetVideo([FromHeader]Guid id)
 	{
 		var result = await _videoService.GetByIdWithIncludes(id);
 		if (result is null)
@@ -24,7 +24,19 @@ public class VideosController : ControllerBase
 		}
 
 		return Ok(result);
-	} 
+	}
+
+	[HttpGet("LockAndUnlockVideo")]
+	public async Task<ActionResult> UnlockOrLock([FromHeader] Guid id)
+	{
+		var result = await _videoService.LockOrUnlockAsync(id);
+		if (result is null)
+		{
+			return BadRequest("video not found");
+		}
+
+		return Ok(result);
+	}
 
 	[HttpPost]
 	public async Task<ActionResult> UploadVideos(IEnumerable<UploadVideoDto> videos)

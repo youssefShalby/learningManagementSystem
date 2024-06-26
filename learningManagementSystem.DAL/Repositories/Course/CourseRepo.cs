@@ -128,7 +128,7 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 
 	public async Task UnlockCourseVideosAsync(Guid id)
 	{
-		var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
+		var course = await GetByIdWithIncludesAsync(id);
 
 		if(course?.Lessons is not null)
 		{

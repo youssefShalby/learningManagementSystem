@@ -73,11 +73,44 @@ public class VideoService : IVideoService
 		}
 	}
 
+	public async Task<CommonResponse> LockOrUnlockAsync(Guid id)
+	{
+		var videoToUpdate = await _unitOfWork.VideoRepo.GetByIdWithIncludesAsync(id);
+		if (videoToUpdate == null)
+		{
+			return new CommonResponse("video not found..!!", false);
+		}
+
+		try
+		{
+			if (videoToUpdate.IsLocked)
+			{
+				videoToUpdate.IsLocked = false;
+			}
+			else
+			{
+				videoToUpdate.IsLocked = true;
+			}
+
+			_unitOfWork.VideoRepo.Update(videoToUpdate);
+			_unitOfWork.VideoRepo.SaveChanges();
+			return new CommonResponse("video lock status updated..!!", true);
+		}
+		catch (Exception ex)
+		{
+			return new CommonResponse($"cannot update lock status for video right now becuase {ex.Message}", false);
+		}
+	}
+
 	public async Task<CommonResponse> UploadVideosAsync(IEnumerable<UploadVideoDto> videos)
 	{
 		try
 		{
 			var newVideos = videos.Select(video => VideoMapper.ToVideoModel(video)).ToList();
+
+			//> unlock first video in each lesson
+			//-- newVideos.First().IsLocked = false;
+
 			await _unitOfWork.VideoRepo.CreateRangeAsync(newVideos);
 			await _unitOfWork.VideoRepo.SaveChangesAsync();
 			return new CommonResponse("video uploaded..!!", true);

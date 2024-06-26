@@ -9,10 +9,19 @@ namespace learningManagementSystem.API.Controllers;
 public class CoursesController : ControllerBase
 {
 	private readonly ICourseService _courseService;
+	private readonly ICourseRepo cs;
 
-	public CoursesController(ICourseService courseService)
+	public CoursesController(ICourseService courseService, ICourseRepo cc)
     {
 		_courseService = courseService;
+		cs = cc;
+	}
+
+	[HttpGet("UnlockVideos")]
+	public async Task<ActionResult> UnlockVideos([FromHeader]Guid id)
+	{
+		var result = await _courseService.UnlockVideos(id);
+		return Ok(result);
 	}
 
 	[HttpGet("GetAllToShow/{pageNumber}")]

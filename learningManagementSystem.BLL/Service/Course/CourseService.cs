@@ -29,6 +29,12 @@ public class CourseService : ICourseService
 
 	}
 
+	public async Task<CommonResponse> UnlockVideos(Guid id)
+	{
+		await _unitOfWork.CourseRepo.UnlockCourseVideosAsync(id);
+		return new CommonResponse("course videos unlocked..!", true);
+	}
+
 	public async Task<CommonResponse> DeleteCourseAsync(Guid id)
 	{
 		var courseToDelete = await _unitOfWork.CourseRepo.GetByIdAsync(id);
