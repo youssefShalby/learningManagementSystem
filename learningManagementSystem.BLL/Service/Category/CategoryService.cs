@@ -2,7 +2,6 @@
 
 
 
-
 namespace learningManagementSystem.BLL.Service;
 
 public class CategoryService : ICategoryService
@@ -92,6 +91,11 @@ public class CategoryService : ICategoryService
 		}
 
 		return CategoryMapper.ToCategoryWithCourseDto(category);
+	}
+
+	public int GetCategoriesCount()
+	{
+		return _unitOfWork.CategoryRepo.GetCategoriesCount();
 	}
 
 	public async Task<CommonResponse> MarkCategoryAsDeletedAsync(Guid id)

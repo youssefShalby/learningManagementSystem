@@ -10,6 +10,8 @@ public class CreateCourseDto
 	public string? ImgeUrl { get; set; }
 	public decimal OfferOrice { get; set; }
 	public Guid? CategoryId { get; set; }
+
+	[JsonIgnore]
 	public Guid? InstructorId { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public List<string>? Advanteges { get; set; }

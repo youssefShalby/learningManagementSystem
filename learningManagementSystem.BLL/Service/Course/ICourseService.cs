@@ -10,8 +10,16 @@ public interface ICourseService
 	Task<IEnumerable<GetCourseWithCategoryDto>> GetStudentCoursesAsync(CourseQueryHandler query, string userId);
 	Task<GetCourseWithIncludesDto> GetByIdWithIncludesAsync(Guid id);
 	Task<CommonResponse> UnlockVideos(Guid id);
-	Task<CommonResponse> CreateCourseAsync(CreateCourseDto model);
+	Task<CommonResponse> CreateCourseAsync(CreateCourseDto model, string userId);
 	Task<CommonResponse> UpdateCourseAsync(Guid id, UpdateCourseDto model);
 	Task<CommonResponse> DeleteCourseAsync(Guid id);
+
+	//> admin dashbaoard endpoints services
 	Task<CommonResponse> MarkCourseAsDeletedAsync(Guid id);
+	Task<IEnumerable<GetCourseToAdminDashDto>> GetCoursesOfLastMonthAsync(int pageNumber);
+	Task<IEnumerable<GetCourseToAdminDashDto>> GetCoursesOfLastYearAsync(int pageNumber);
+	public int GetCoursesCountOfLastYear();
+	public int GetCoursesCountOfLastMonth();
+	public int GetCoursesCount();
+
 }

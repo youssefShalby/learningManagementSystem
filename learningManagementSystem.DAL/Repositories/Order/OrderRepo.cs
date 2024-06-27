@@ -7,10 +7,12 @@ namespace learningManagementSystem.DAL.Repositories;
 public class OrderRepo : GenericRepo<Order>, IOrderRepo
 {
 	private readonly AppDbContext _context;
+	private readonly IConfiguration _configuration;
 
 	public OrderRepo(AppDbContext context, IConfiguration configuration) : base(context, configuration)
     {
 		_context = context;
+		_configuration = configuration;
 	}
 
 	public async Task<IEnumerable<Order>> GetAllOrdersForUserAsync(ApplicationUser user)
@@ -29,6 +31,49 @@ public class OrderRepo : GenericRepo<Order>, IOrderRepo
 
 		}).ToListAsync();
 
+	}
+
+	public async Task<IEnumerable<Order>> GetOrdersOfLastMonthAsync(int pageNumber)
+	{
+		var orders =  _context.Orders
+			.Include(o => o.Course)
+			.Include(o => o.Student).ThenInclude(s => s!.AppUser)
+			.Where(O => O.CreatedAt >= DateTime.Now.AddMonths(-1)).AsQueryable();
+
+		var pageSize = int.Parse(_configuration["CustomConfiguration:PageSize"] ?? "10");
+
+		orders = orders.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+		return await orders.ToListAsync();
+	} 
+	
+	public async Task<IEnumerable<Order>> GetOrdersOfLastYearAsync(int pageNumber)
+	{
+		var orders = _context.Orders
+			.Include(o => o.Course)
+			.Include(o => o.Student).ThenInclude(s => s!.AppUser)
+			.Where(O => O.CreatedAt >= DateTime.Now.AddYears(-1)).AsQueryable();
+
+		var pageSize = int.Parse(_configuration["CustomConfiguration:PageSize"] ?? "10");
+
+		orders = orders.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+		return await orders.ToListAsync();
+	}
+
+	public int GetOrdersCountOfLastYear()
+	{
+		return _context.Set<Order>()
+			.Where(c => c.CreatedAt >= DateTime.Now.AddYears(-1)).Count();
+	}
+
+	public int GetOrdersCountOfLastMonth()
+	{
+		return _context.Set<Order>()
+			.Where(c => c.CreatedAt >= DateTime.Now.AddMonths(-1)).Count();
+	}
+
+	public int GetOrdersCount()
+	{
+		return _context.Orders.Count();
 	}
 
 	public async Task<Order> GetByIdWithIncludesAsync(Guid id)

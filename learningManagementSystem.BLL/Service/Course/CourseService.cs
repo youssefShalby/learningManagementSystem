@@ -2,6 +2,7 @@
 
 
 
+
 namespace learningManagementSystem.BLL.Service;
 
 public class CourseService : ICourseService
@@ -13,10 +14,13 @@ public class CourseService : ICourseService
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<CommonResponse> CreateCourseAsync(CreateCourseDto model)
+	public async Task<CommonResponse> CreateCourseAsync(CreateCourseDto model, string userId)
 	{
 		try
 		{
+			var instructor = await _unitOfWork.InstructorRepo.GetByRefIdAsync(userId);
+
+			model.InstructorId = instructor.Id;
 			var newCourse = CourseMapper.FromCreateDto(model);
 			await _unitOfWork.CourseRepo.CreateAsync(newCourse);
 			await _unitOfWork.CourseRepo.SaveChangesAsync();
@@ -93,7 +97,8 @@ public class CourseService : ICourseService
 
 	public async Task<IEnumerable<GetCourseWithCategoryDto>> GetInstructorCoursesAsync(CourseQueryHandler query, string userId)
 	{
-		var courses = await _unitOfWork.CourseRepo.GetInstructorCoursesAsync(query, userId);
+		var instructor = await _unitOfWork.InstructorRepo.GetByRefIdAsync(userId);
+		var courses = await _unitOfWork.CourseRepo.GetInstructorCoursesAsync(query, instructor.Id);
 		if (courses is null)
 		{
 			return null!;
@@ -104,7 +109,8 @@ public class CourseService : ICourseService
 
 	public async Task<IEnumerable<GetCourseWithCategoryDto>> GetStudentCoursesAsync(CourseQueryHandler query, string userId)
 	{
-		var courses = await _unitOfWork.StudentCourseRepo.GetStudentCoursesAsync(query, userId);
+		var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(userId);
+		var courses = await _unitOfWork.StudentCourseRepo.GetStudentCoursesAsync(query, student.Id);
 		if (courses is null)
 		{
 			return null!;
@@ -171,5 +177,52 @@ public class CourseService : ICourseService
 		{
 			return new CommonResponse($"cannot update course right now beause: {ex.Message}", false);
 		}
+	}
+
+	public async Task<IEnumerable<GetCourseToAdminDashDto>> GetCoursesOfLastMonthAsync(int pageNumber)
+	{
+		var orders = await _unitOfWork.CourseRepo.GetCoursesOfLastMonthAsync(pageNumber);
+
+		return orders.Select(order => new GetCourseToAdminDashDto
+		{
+			Description = order.Description,
+			InstructorEmail = order.Instructor?.AppUser?.Email ?? "NA",
+			OfferOrice = order.OfferOrice,
+			OriginalOrice = order.OriginalOrice,
+			StudentsNumber = order.StudentsNumber,
+			Title = order.Title
+
+		}).ToList();
+	}
+
+	public async Task<IEnumerable<GetCourseToAdminDashDto>> GetCoursesOfLastYearAsync(int pageNumber)
+	{
+		var orders = await _unitOfWork.CourseRepo.GetCoursesOfLastYearAsync(pageNumber);
+
+		return orders.Select(order => new GetCourseToAdminDashDto
+		{
+			Description = order.Description,
+			InstructorEmail = order.Instructor?.AppUser?.Email ?? "NA",
+			OfferOrice = order.OfferOrice,
+			OriginalOrice = order.OriginalOrice,
+			StudentsNumber = order.StudentsNumber,
+			Title = order.Title
+
+		}).ToList();
+	}
+
+	public int GetCoursesCountOfLastYear()
+	{
+		return _unitOfWork.CourseRepo.GetCoursesCountOfLastYear();
+	}
+
+	public int GetCoursesCountOfLastMonth()
+	{
+		return _unitOfWork.CourseRepo.GetCoursesCountOfLastMonth();
+	}
+
+	public int GetCoursesCount()
+	{
+		return _unitOfWork.CourseRepo.GetCoursesCount();
 	}
 }

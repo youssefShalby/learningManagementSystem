@@ -7,5 +7,10 @@ public interface IOrderRepo : IGenericRepo<Order>
 	Task<Order> GetOrderByPaymentInetntIdAsync(string paymentIntentId);
 	Task<IEnumerable<Order>> GetAllOrdersForUserAsync(ApplicationUser user);
 	bool HasPurchasedCourse(Guid userId, Guid courseId);
+	Task<IEnumerable<Order>> GetOrdersOfLastMonthAsync(int pageNumber);
+	Task<IEnumerable<Order>> GetOrdersOfLastYearAsync(int pageNumber);
 
+	public int GetOrdersCountOfLastYear();
+	public int GetOrdersCountOfLastMonth();
+	public int GetOrdersCount();
 }

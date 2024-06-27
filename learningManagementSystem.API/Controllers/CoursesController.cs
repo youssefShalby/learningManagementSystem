@@ -93,7 +93,9 @@ public class CoursesController : ControllerBase
 	[Authorize(policy: "Instructor")]
 	public async Task<ActionResult> Create(CreateCourseDto model)
 	{
-		var result = await _courseService.CreateCourseAsync(model);
+		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+		var result = await _courseService.CreateCourseAsync(model, userId ?? "");
 		if (!result.IsSuccessed)
 		{
 			return BadRequest(result);

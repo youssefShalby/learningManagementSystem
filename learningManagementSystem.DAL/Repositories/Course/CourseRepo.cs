@@ -20,7 +20,8 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 
 		if (query.PageSize <= 0)
 		{
-			query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : int.Parse(_configuration["CustomConfiguration:PageSize"]);
+			query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : 
+				int.Parse(_configuration["CustomConfiguration:PageSize"]);
 		}
 
 		//> filter
@@ -62,11 +63,57 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 			.FirstOrDefaultAsync(c => c.Id == id) ?? null!;
 	}
 
-	public async Task<IEnumerable<Course>> GetInstructorCoursesAsync(CourseQueryHandler query, string userId)
+	public int GetInstructorCoursesCount(Guid instructordId)
+	{
+		return _context.Courses.Where(C => C.Instructor!.Id == instructordId && C.IsDeleted == false).Count();
+	}
+
+	public async Task<IEnumerable<Course>> GetCoursesOfLastMonthAsync(int pageNumber)
+	{
+		var courses = _context.Set<Course>()
+			.Include(C => C.Instructor).ThenInclude(I => I!.AppUser)
+			.Where(c => c.CreatedAt >= DateTime.Now.AddMonths(-1)).AsQueryable();
+
+		var pageSize = int.Parse(_configuration["CustomConfiguration:PageSize"] ?? "10");
+
+		courses = courses.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+		return await courses.ToListAsync();
+	}
+
+	public async Task<IEnumerable<Course>> GetCoursesOfLastYearAsync(int pageNumber)
+	{
+		var courses = _context.Set<Course>()
+			.Include(C => C.Instructor).ThenInclude(I => I!.AppUser)
+			.Where(c => c.CreatedAt >= DateTime.Now.AddYears(-1)).AsQueryable();
+
+		var pageSize = int.Parse(_configuration["CustomConfiguration:PageSize"] ?? "10");
+
+		courses = courses.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+		return await courses.ToListAsync();
+	}
+
+	public int GetCoursesCountOfLastYear()
+	{
+		return _context.Set<Course>()
+			.Where(c => c.CreatedAt >= DateTime.Now.AddYears(-1)).Count();
+	}
+
+	public int GetCoursesCountOfLastMonth()
+	{
+		return _context.Set<Course>()
+			.Where(c => c.CreatedAt >= DateTime.Now.AddMonths(-1)).Count();
+	}
+
+	public int GetCoursesCount()
+	{
+		return _context.Courses.Count();
+	}
+
+	public async Task<IEnumerable<Course>> GetInstructorCoursesAsync(CourseQueryHandler query, Guid instructorId)
 	{
 		try
 		{
-			var portfolio = _context.Courses.Where(C => C.Instructor!.Id.ToString() == userId && C.IsDeleted == false);
+			var portfolio = _context.Courses.Where(C => C.Instructor!.Id == instructorId && C.IsDeleted == false);
 
 			if (!string.IsNullOrEmpty(query.Title))
 			{

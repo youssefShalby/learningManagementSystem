@@ -48,5 +48,10 @@ public class CategoryRepo : GenericRepo<Category>, ICategoryRepo
 			.FirstOrDefaultAsync(c => c.Id == id) ?? null!;		
 	}
 
+	public int GetCategoriesCount()
+	{
+		return _context.Categories.Count();
+	}
+
 	//> Implement more method to serve the model here...
 }

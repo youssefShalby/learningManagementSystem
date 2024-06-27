@@ -1,5 +1,6 @@
 ﻿
 
+
 namespace learningManagementSystem.BLL.Service;
 
 public interface ICategoryService
@@ -11,4 +12,5 @@ public interface ICategoryService
 	Task<CommonResponse> UpdateCategoryAsync(Guid id, UpdateCategoryDto model);
 	Task<CommonResponse> DeleteCategoryAsync(Guid id);
 	Task<CommonResponse> MarkCategoryAsDeletedAsync(Guid id);
+	public int GetCategoriesCount();
 }

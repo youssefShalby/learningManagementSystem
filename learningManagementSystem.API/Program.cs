@@ -53,6 +53,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<AccessVideosFilter>();
 
@@ -108,7 +109,7 @@ builder.Services.AddAuthorization(options =>
 {
 	options.AddPolicy("Admin", builder => builder.RequireClaim(ClaimTypes.Role, "Admin"));
 	options.AddPolicy("Instructor", builder => builder.RequireClaim(ClaimTypes.Role, "Admin", "Instructor"));
-	options.AddPolicy("Students", builder => builder.RequireClaim(ClaimTypes.Role, "Admin", "Instructor", "Student"));
+	options.AddPolicy("Student", builder => builder.RequireClaim(ClaimTypes.Role, "Admin", "Instructor", "Student"));
 });
 
 

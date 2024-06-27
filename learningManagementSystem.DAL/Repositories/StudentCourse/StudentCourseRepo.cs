@@ -15,12 +15,20 @@ public class StudentCourseRepo : GenericRepo<StudentCourse>, IStudentCourseRepo
 		_configuration = configuration;
 	}
 
-
-	public async Task<IEnumerable<Course>> GetStudentCoursesAsync(CourseQueryHandler query, string userId)
+	public int GetStudentCoursesCount(Guid studentId)
+	{
+		return _context.StudentCourses
+			.Include(SC => SC.Course)
+			.Where(SC => SC.Student!.Id == studentId && SC.Course!.IsDeleted == false).Count();
+	}
+	public async Task<IEnumerable<Course>> GetStudentCoursesAsync(CourseQueryHandler query, Guid studentId)
 	{
 		try
 		{
-			var portfolio = _context.StudentCourses.Where(SC => SC.Student!.Id.ToString() == userId && SC.Course!.IsDeleted == false);
+			var portfolio = _context.StudentCourses
+				.Include(SC => SC.Course)
+				.Include(SC => SC.Student)
+				.Where(SC => SC.Student!.Id == studentId && SC.Course!.IsDeleted == false).AsQueryable();
 
 			if (!string.IsNullOrEmpty(query.Title))
 			{
@@ -50,24 +58,9 @@ public class StudentCourseRepo : GenericRepo<StudentCourse>, IStudentCourseRepo
 				query.PageSize = _configuration["CustomConfiguration:PageSize"] is null ? 10 : int.Parse(_configuration["CustomConfiguration:PageSize"]);
 			}
 
-			var courses = await portfolio.Select(course => new Course
-			{
-				Id = course.CourseId,
-				Advanteges = course.Course!.Advanteges,
-				Category = course.Course.Category,
-				Title = course.Course.Title,
-				StudentsNumber = course.Course.StudentsNumber,
-				OriginalOrice = course.Course.OriginalOrice,
-				OfferOrice = course.Course.OfferOrice,
-				IsDeleted = course.Course.IsDeleted,
-				Lessons = course.Course.Lessons,
-				Details = course.Course.Details,
-				Description = course.Course.Description,
-				CreatedAt = course.Course.CreatedAt,
-				Comments = course.Course.Comments,
-				CategoryId = course.Course.CategoryId
+			portfolio =  portfolio.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize);
 
-			}).ToListAsync();
+			var courses = await portfolio.Select(course => ToCourseFronStudentCourse(course)).ToListAsync();
 
 			return courses;
 		}
@@ -75,6 +68,27 @@ public class StudentCourseRepo : GenericRepo<StudentCourse>, IStudentCourseRepo
 		{
 			return null!;
 		}
+	}
+
+	//> make it static to prevent memory leak exception
+	private static Course ToCourseFronStudentCourse(StudentCourse course)
+	{
+		return new Course
+		{
+			Advanteges = course.Course!.Advanteges,
+			Category = course.Course.Category,
+			Title = course.Course.Title,
+			StudentsNumber = course.Course.StudentsNumber,
+			OriginalOrice = course.Course.OriginalOrice,
+			OfferOrice = course.Course.OfferOrice,
+			IsDeleted = course.Course.IsDeleted,
+			Lessons = course.Course.Lessons,
+			Details = course.Course.Details,
+			Description = course.Course.Description,
+			CreatedAt = course.Course.CreatedAt,
+			Comments = course.Course.Comments,
+			CategoryId = course.Course.CategoryId
+		};
 	}
 
 	public int GetStudentsNumber(Guid courseId)

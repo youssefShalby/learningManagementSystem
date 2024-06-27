@@ -1,13 +1,10 @@
 ﻿
 
-
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Security.AccessControl;
+using Microsoft.EntityFrameworkCore;
 
 namespace learningManagementSystem.BLL.Service;
 
-public class UserService : IUserService
+public class UserService : IUserService, IUserDashboardService, IUserAccountManagmentService
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IHandlerService _handlerService;
@@ -33,6 +30,11 @@ public class UserService : IUserService
 		if(user is null)
 		{
 			return new CommonResponse("user not found..!!", false);
+		}
+
+		if (user.LockoutEnd != null)
+		{
+			return new CommonResponse("user blocked..!!", false);
 		}
 
 		if (user.EmailConfirmed)
@@ -87,6 +89,11 @@ public class UserService : IUserService
 			return new CommonResponse("user not found..!!", false);
 		}
 
+		if (user.LockoutEnd != null)
+		{
+			return new CommonResponse("user blocked..!!", false);
+		}
+
 		var generateToken = await _unitOfWork.UserManager.GeneratePasswordResetTokenAsync(user);
 		var tokenInBytes = Encoding.UTF8.GetBytes(generateToken);
 		var token = WebEncoders.Base64UrlEncode(tokenInBytes);
@@ -104,17 +111,17 @@ public class UserService : IUserService
 
 	}
 
-	public Task<ApplicationUser> GetUserByEmailAsync(string email)
-	{
-		return _unitOfWork.UserManager.FindByEmailAsync(email) ?? null!;
-	}
-
 	public async Task<CommonResponse> LoginAsync(LoginDto model)
 	{
 		var user = await _unitOfWork.UserManager.FindByEmailAsync(model.Email);
 		if(user is null)
 		{
 			return new CommonResponse("user name or password not valid..!!!", false);
+		}
+
+		if (user.LockoutEnd != null)
+		{
+			return new CommonResponse("user blocked..!!", false);
 		}
 
 		var tokenCookieId = Helper.GetFirstFiveCharsFromId(user.Id);
@@ -156,8 +163,6 @@ public class UserService : IUserService
 			var tokenResponse = new TokenDto(token, expire);
 			return new CommonResponse("user logged in success..!!", true, null!, tokenResponse);
 		}
-
-
 	}
 
 	public async Task<CommonResponse> LogoutAsync(string email)
@@ -197,6 +202,8 @@ public class UserService : IUserService
 
 		return await _handlerService.RegisterHandlerAsync(model, mainRole.Name, mainRole.Name);
 	}
+
+	
 
 	public async Task<CommonResponse> RemoveAccountAsync(RemoveAccountDto model)
 	{
@@ -245,6 +252,11 @@ public class UserService : IUserService
 			return new CommonResponse("user not found...!!!", false);
 		}
 
+		if (user.LockoutEnd != null)
+		{
+			return new CommonResponse("user blocked..!!", false);
+		}
+
 		string verificationCode = _emailService.GenerateOTPCode();
 		string emailBody = _emailService.GetConfirmationEmailBody(verificationCode, user.DisplayName);
 
@@ -279,6 +291,11 @@ public class UserService : IUserService
 		if(user is null)
 		{
 			return new CommonResponse("user not found...!!!", false);
+		}
+
+		if (user.LockoutEnd != null)
+		{
+			return new CommonResponse("user blocked..!!", false);
 		}
 
 		if (model.NewPassword != model.ConfirmPassword)
@@ -369,4 +386,190 @@ public class UserService : IUserService
 
 		return new CommonResponse("account updated success..!!", true);
 	}
+
+	public async Task<CommonResponse> MarkUserAsAdminAsync(string email)
+	{
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(email);
+		if(user is null)
+		{
+			return new CommonResponse("user not found..!", false);
+		}
+
+		if(await _unitOfWork.UserManager.IsInRoleAsync(user, "Admin"))
+		{
+			return new CommonResponse("user already have admin role..!!", false);
+		}
+
+		var claims = await _unitOfWork.UserManager.GetClaimsAsync(user);
+		var currentRole = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+		//> remove current role
+		var removeClaimResult = await _unitOfWork.UserManager.RemoveClaimAsync(user, currentRole);
+		if (!removeClaimResult.Succeeded)
+		{
+			return new CommonResponse("cannot remove current role claim..!", false);
+		}
+
+		//> add new role(admin)
+		var addClaimResult = await _unitOfWork.UserManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "Admin"));
+		if (!addClaimResult.Succeeded)
+		{
+			return new CommonResponse("cannot assign new role claim to user..!!", false);
+		}
+
+		var addToRoleResult = await _unitOfWork.UserManager.AddToRoleAsync(user, "Admin");
+		if(!addToRoleResult.Succeeded)
+		{
+			return new CommonResponse("cannot assign admin role to user right now..!!", false);
+		}
+
+		var resultOfUpdate = await _unitOfWork.UserManager.UpdateAsync(user);
+		if(!resultOfUpdate.Succeeded)
+		{
+			return new CommonResponse("cannot assign admin role to user right now..!!", false);
+		}
+
+		return new CommonResponse("Admin role assigned to the user..!!", true);
+
+	}
+
+	public async Task<CommonResponse> RegisterAdminAsync(RegisterDto model)
+	{
+		var mainRole = await _unitOfWork.RoleManager.FindByNameAsync("Admin");
+		if(mainRole is null)
+		{
+			return new CommonResponse("cannot find the admin role, tell another admin to create it..!!", false);
+		}
+
+		return await _handlerService.RegisterHandlerAsync(model, mainRole.Name, mainRole.Name);
+	}
+
+	public async Task<GetUserDto> GetUserByEmailOrUserNameAsync(string emailOrUserName)
+	{
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(emailOrUserName);
+		if (user is null)
+		{
+			user = await _unitOfWork.UserManager.FindByNameAsync(emailOrUserName);
+			if(user is null)
+			{
+				return null!;
+			}
+		}
+
+		var claims = await _unitOfWork.UserManager.GetClaimsAsync(user);
+		var role = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+		int? coursesCreated = 0;
+		int? coursesEnrolled = 0;
+
+		if(await _unitOfWork.UserManager.IsInRoleAsync(user, "Instructor"))
+		{
+			var instructor = await _unitOfWork.InstructorRepo.GetByRefIdAsync(user.Id);
+			if(instructor is not null)
+			{
+				coursesCreated = _unitOfWork.CourseRepo.GetInstructorCoursesCount(instructor.Id);
+			}
+		}
+
+		if (await _unitOfWork.UserManager.IsInRoleAsync(user, "Student"))
+		{
+			var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(user.Id);
+			if (student is not null)
+			{
+				coursesEnrolled = _unitOfWork.StudentCourseRepo.GetStudentCoursesCount(student.Id);
+			}
+		}
+
+		return new GetUserDto
+		{
+			Email = user.Email,
+			UserName = user.UserName,
+			Role = role ?? "NA",
+			DisplayName = user.DisplayName,
+			PhoneNumber = user.PhoneNumber,
+			CoursesCreated = (int)coursesCreated!,
+			CoursesEnrolled = (int)coursesEnrolled!
+		};
+	}
+
+
+	public int GetUsersNumber()
+	{
+		return _unitOfWork.UserManager.Users.Count();
+	}
+
+	public async Task<int> GetStudentsNumberAsync()
+	{
+		var users = await _unitOfWork.UserManager.GetUsersInRoleAsync("Student");
+		return users.Count();
+ 	}
+
+	public async Task<int> GetInstructorsNumberAsync()
+	{
+		var users = await _unitOfWork.UserManager.GetUsersInRoleAsync("Instructor");
+		return users.Count();
+	}
+
+	public async Task<int> GetAdminsCountAsync()
+	{
+		var users = await _unitOfWork.UserManager.GetUsersInRoleAsync("Admin");
+		return users.Count();
+	}
+
+	public async Task<int> GetBockedUsersCountAsync()
+	{
+		var blockedUsers = await _unitOfWork.UserManager.Users.Where(user => user.LockoutEnd != null).ToListAsync();
+		return blockedUsers.Count();
+	}
+
+
+	public async Task<CommonResponse> BlockUserForPeriodAsync(BlockUserDto model)
+	{
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(model.Email);
+		if(user is null)
+		{
+			return new CommonResponse("user not found..!!", false);
+		}
+
+		if (model.IsForever)
+		{
+			user.LockoutEnd = DateTime.Now.AddYears(1000);
+			var resultOfBlockForever = await _unitOfWork.UserManager.UpdateAsync(user);
+			if (!resultOfBlockForever.Succeeded)
+			{
+				return new CommonResponse("cannot block user right now..!!", false);
+			}
+
+			return new CommonResponse("user blocked forever..!!", true);
+		}
+
+		user.LockoutEnd = DateTime.Now.AddDays(model.NumberOfDays);
+		var result = await _unitOfWork.UserManager.UpdateAsync(user);
+		if (!result.Succeeded)
+		{
+			return new CommonResponse("cannot block user right now..!!", false);
+		}
+
+		return new CommonResponse($"user blocked for {model.NumberOfDays} days", true);
+	}
+
+	public async Task<CommonResponse> UnBlockUserForPeriodAsync(string email)
+	{
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(email);
+		if (user is null)
+		{
+			return new CommonResponse("user not found..!!", false);
+		}
+
+		user.LockoutEnd = null!;
+		var result = await _unitOfWork.UserManager.UpdateAsync(user);
+		if (!result.Succeeded)
+		{
+			return new CommonResponse("cannot block user right now..!!", false);
+		}
+
+		return new CommonResponse("User Unblocked..!!", true);
+	}
+
+	
 }
