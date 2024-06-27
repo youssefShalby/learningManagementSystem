@@ -11,9 +11,9 @@ namespace learningManagementSystem.API.Controllers;
 [Authorize]
 public class AccountSettingsController : ControllerBase
 {
-	private readonly IUserService _userService;
+	private readonly IUserAccountManagmentService _userService;
 
-	public AccountSettingsController(IUserService userService)
+	public AccountSettingsController(IUserAccountManagmentService userService)
 	{
 		_userService = userService;
 	}

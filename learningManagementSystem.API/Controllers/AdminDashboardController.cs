@@ -8,13 +8,13 @@ namespace learningManagementSystem.API.Controllers;
 [Authorize(policy: "Admin")]
 public class AdminDashboardController : ControllerBase
 {
-	private readonly IUserService _userService;
+	private readonly IUserDashboardService _userService;
 	private readonly IRoleService _roleService;
 	private readonly IOrderService _orderService;
 	private readonly ICourseService _courseService;
 	private readonly ICategoryService _categoryService;
 
-	public AdminDashboardController(IUserService userService, IRoleService roleService, 
+	public AdminDashboardController(IUserDashboardService userService, IRoleService roleService, 
 			IOrderService orderService, ICourseService courseService, ICategoryService categoryService)
     {
 		_userService = userService;

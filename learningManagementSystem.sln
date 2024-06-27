@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "learningManagementSystem.API", "learningManagementSystem.API\learningManagementSystem.API.csproj", "{5EBC5488-63A2-46BD-AEE7-8A998DED7130}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "learningManagementSystem.API", "learningManagementSystem.API\learningManagementSystem.API.csproj", "{5EBC5488-63A2-46BD-AEE7-8A998DED7130}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "learningManagementSystem.BLL", "learningManagementSystem.BLL\learningManagementSystem.BLL.csproj", "{5662BC50-890B-449F-9390-2122B9507828}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "learningManagementSystem.BLL", "learningManagementSystem.BLL\learningManagementSystem.BLL.csproj", "{5662BC50-890B-449F-9390-2122B9507828}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "learningManagementSystem.DAL", "learningManagementSystem.DAL\learningManagementSystem.DAL.csproj", "{466F5B94-EDC2-4652-984F-A991DECC6D7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "learningManagementSystem.DAL", "learningManagementSystem.DAL\learningManagementSystem.DAL.csproj", "{466F5B94-EDC2-4652-984F-A991DECC6D7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
