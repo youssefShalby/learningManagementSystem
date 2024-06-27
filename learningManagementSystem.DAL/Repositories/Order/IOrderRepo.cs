@@ -6,4 +6,6 @@ public interface IOrderRepo : IGenericRepo<Order>
 	Task<Order> GetByIdWithIncludesAsync(Guid id);
 	Task<Order> GetOrderByPaymentInetntIdAsync(string paymentIntentId);
 	Task<IEnumerable<Order>> GetAllOrdersForUserAsync(ApplicationUser user);
+	bool HasPurchasedCourse(Guid userId, Guid courseId);
+
 }

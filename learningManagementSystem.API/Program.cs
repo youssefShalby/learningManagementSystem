@@ -1,4 +1,7 @@
 
+using learningManagementSystem.API.Filter;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -51,6 +54,7 @@ builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 
+builder.Services.AddScoped<AccessVideosFilter>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>
 {
@@ -93,8 +97,8 @@ result.AddJwtBearer(option =>
 	{
 		ValidateIssuer = true,
 		ValidIssuer = builder.Configuration["JWT:issuer"],
-		ValidateAudience = true,
-		ValidAudience = builder.Configuration["JWT:audience"],
+		ValidateAudience = false,
+		//> ValidAudience = builder.Configuration["JWT:audience"],
 		IssuerSigningKey = key
 	};
 });
@@ -109,6 +113,34 @@ builder.Services.AddAuthorization(options =>
 
 
 
+//> swager
+builder.Services.AddSwaggerGen(setup =>
+{
+	// Include 'SecurityScheme' to use JWT Authentication
+	var jwtSecurityScheme = new OpenApiSecurityScheme
+	{
+		BearerFormat = "JWT",
+		Name = "JWT Authentication",
+		In = ParameterLocation.Header,
+		Type = SecuritySchemeType.Http,
+		Scheme = JwtBearerDefaults.AuthenticationScheme,
+		Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
+
+		Reference = new OpenApiReference
+		{
+			Id = JwtBearerDefaults.AuthenticationScheme,
+			Type = ReferenceType.SecurityScheme
+		}
+	};
+
+	setup.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+	setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{ jwtSecurityScheme, Array.Empty<string>() }
+	});
+
+});
 
 #endregion
 
@@ -127,6 +159,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -3,7 +3,7 @@ namespace learningManagementSystem.BLL.DTOs;
 
 public class RemoveAccountDto
 {
-	[EmailAddress, Required]
+	[JsonIgnore]
 	public string Email { get; set; } = string.Empty;
 
 	[Required]

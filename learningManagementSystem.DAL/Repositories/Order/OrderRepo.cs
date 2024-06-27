@@ -42,4 +42,9 @@ public class OrderRepo : GenericRepo<Order>, IOrderRepo
 	{
 		return await _context.Orders.FirstOrDefaultAsync(o => o.PaymentIntentId == paymentIntentId) ?? null!;
 	}
+
+	public bool HasPurchasedCourse(Guid userId, Guid courseId)
+	{
+		return _context.Orders.Any(cp => cp.CourseId == courseId && cp.StudentId == userId);
+	}
 }

@@ -5,6 +5,7 @@ namespace learningManagementSystem.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(policy: "Admin")]
 public class RoleController : ControllerBase
 {
 	private readonly IRoleService _roleService;

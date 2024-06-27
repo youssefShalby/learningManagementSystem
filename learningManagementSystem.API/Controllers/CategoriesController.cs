@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace learningManagementSystem.API.Controllers;
 
 
@@ -16,6 +18,7 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("GetAllToShow/{pageNumber}")]
+	[Authorize]
 	public async Task<ActionResult> GetAllToShow(int pageNumber)
 	{
 		var categories = await _categoryService.GetAllAsync(pageNumber);
@@ -28,7 +31,8 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpPost("GetAll")]
-	public async Task<ActionResult> GetAll([FromBody]CategoryQueryHandler query)
+	[Authorize]
+	public async Task<ActionResult> GetAll([FromBody] CategoryQueryHandler query)
 	{
 		var categories = await _categoryService.GetAllByQueryAsync(query);
 		if (categories is null)
@@ -40,6 +44,7 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("GetById/{id}")]
+	[Authorize]
 	public async Task<ActionResult> GetById(Guid id)
 	{
 		var category = await _categoryService.GetByIdWithIncludesAsync(id);
@@ -53,6 +58,7 @@ public class CategoriesController : ControllerBase
 
 
 	[HttpPost]
+	[Authorize(policy: "Admin")]
 	public async Task<ActionResult> Create(CreateCategoryDto model)
 	{
 		var result = await _categoryService.CreateCategoryAsync(model);
@@ -63,9 +69,10 @@ public class CategoriesController : ControllerBase
 
 		return Ok(result);
 	}
-	
-	[HttpPut]
-	public async Task<ActionResult> Update([FromHeader]Guid id, UpdateCategoryDto model)
+
+	[HttpPut("{id}")]
+	[Authorize(policy: "Admin")]
+	public async Task<ActionResult> Update([FromRoute] Guid id, UpdateCategoryDto model)
 	{
 		var result = await _categoryService.UpdateCategoryAsync(id, model);
 		if (!result.IsSuccessed)
@@ -75,10 +82,11 @@ public class CategoriesController : ControllerBase
 
 		return Ok(result);
 	}
-	
-	
-	[HttpDelete]
-	public async Task<ActionResult> Delete([FromHeader]Guid id)
+
+
+	[HttpDelete("{id}")]
+	[Authorize(policy: "Admin")]
+	public async Task<ActionResult> Delete(Guid id)
 	{
 		var result = await _categoryService.DeleteCategoryAsync(id);
 		if (!result.IsSuccessed)
@@ -89,8 +97,9 @@ public class CategoriesController : ControllerBase
 		return Ok(result);
 	}
 	
-	[HttpDelete("MarkAsDeleted")]
-	public async Task<ActionResult> MarkAsDeleted([FromHeader]Guid id)
+	[HttpDelete("MarkAsDeleted/{id}")]
+	[Authorize(policy: "Admin")]
+	public async Task<ActionResult> MarkAsDeleted(Guid id)
 	{
 		var result = await _categoryService.MarkCategoryAsDeletedAsync(id);
 		if (!result.IsSuccessed)

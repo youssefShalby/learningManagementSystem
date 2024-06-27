@@ -14,8 +14,8 @@ public class LessonsController : ControllerBase
 		_lessonService = lessonService;
 	}
 
-	[HttpGet("LessonVideos")]
-	public async Task<ActionResult> GetVideos([FromHeader]Guid id)
+	[HttpGet("LessonVideos/{id}")]
+	public async Task<ActionResult> GetVideos(Guid id)
 	{
 		var vidoes = await _lessonService.GetVideosOfLessonAsync(id);
 		if(vidoes is null)
@@ -26,6 +26,7 @@ public class LessonsController : ControllerBase
 	}
 
 	[HttpPost]
+	[Authorize(policy: "Instructor")]
 	public async Task<ActionResult> CreateLesson(CreateLessonDto model)
 	{
 		var result = await _lessonService.CreateLessonAsync(model);
@@ -37,8 +38,9 @@ public class LessonsController : ControllerBase
 		return StatusCode(201, result);
 	}
 
-	[HttpPut]
-	public async Task<ActionResult> UpdateLesson([FromHeader]Guid id, UpdateLessonDto model)
+	[HttpPut("{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> UpdateLesson([FromRoute]Guid id, UpdateLessonDto model)
 	{
 		var result = await _lessonService.UpdateLessonAsync(id, model);
 		if (!result.IsSuccessed)
@@ -49,8 +51,9 @@ public class LessonsController : ControllerBase
 		return Ok(result);
 	}
 	
-	[HttpDelete]
-	public async Task<ActionResult> DeleteLesson([FromHeader]Guid id)
+	[HttpDelete("{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> DeleteLesson(Guid id)
 	{
 		var result = await _lessonService.DeleteLessonAsync(id);
 		if (!result.IsSuccessed)
@@ -61,8 +64,9 @@ public class LessonsController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpDelete("MarkLessonAsDeleted")]
-	public async Task<ActionResult> MarkLessonAsDeleted([FromHeader] Guid id)
+	[HttpDelete("MarkLessonAsDeleted/{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> MarkLessonAsDeleted(Guid id)
 	{
 		var result = await _lessonService.MarkLessonAsDeletedAsync(id);
 		if (!result.IsSuccessed)

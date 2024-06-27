@@ -6,6 +6,7 @@ namespace learningManagementSystem.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CoursePaymentsController : ControllerBase
 {
 	private readonly ICoursePaymentService _coursePaymentService;
@@ -15,8 +16,8 @@ public class CoursePaymentsController : ControllerBase
 		_coursePaymentService = coursePaymentService;
 	}
 
-	[HttpGet("GetCourse")]
-	public async Task<ActionResult> GetById([FromHeader]Guid id)
+	[HttpGet("GetCourse/{id}")]
+	public async Task<ActionResult> GetById(Guid id)
 	{
 		var result = await _coursePaymentService.GetByIdAsync(id);
 		if(result is null)
@@ -38,8 +39,8 @@ public class CoursePaymentsController : ControllerBase
 		return StatusCode(201, result);
 	}
 
-	[HttpPut]
-	public async Task<ActionResult> UpdateCoursePayment([FromHeader] Guid id, UpdateCoursePaymentDto model)
+	[HttpPut("{id}")]
+	public async Task<ActionResult> UpdateCoursePayment([FromRoute] Guid id, UpdateCoursePaymentDto model)
 	{
 		var result = await _coursePaymentService.UpdateCoursePaymentAsync(id, model);
 		if (!result.IsSuccessed)
@@ -49,8 +50,8 @@ public class CoursePaymentsController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpDelete]
-	public async Task<ActionResult> DeleteCoursePayment([FromHeader] Guid id)
+	[HttpDelete("{id}")]
+	public async Task<ActionResult> DeleteCoursePayment(Guid id)
 	{
 		var result = await _coursePaymentService.DeleteCoursePaymentAsync(id);
 		if (!result.IsSuccessed)

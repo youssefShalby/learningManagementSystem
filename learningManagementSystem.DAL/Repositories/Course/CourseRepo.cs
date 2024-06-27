@@ -126,6 +126,11 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 		}
 	}
 
+	public bool IsInstructorOfCourse(Guid userId, Guid courseId)
+	{
+		return  _context.Courses.Any(c => c.Id == courseId && c.InstructorId == userId);
+	}
+
 	public async Task UnlockCourseVideosAsync(Guid id)
 	{
 		var course = await GetByIdWithIncludesAsync(id);

@@ -4,7 +4,7 @@ namespace learningManagementSystem.BLL.DTOs;
 
 public class CreateOrUpdatePaymentDto
 {
-    [EmailAddress]
+    [JsonIgnore]
     public string Email { get; set; } = string.Empty;
     public Guid CoursePaymentId { get; set; }
 

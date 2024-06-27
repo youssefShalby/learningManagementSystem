@@ -8,4 +8,5 @@ public interface ICourseRepo : IGenericRepo<Course>
 	Task<Course> GetByIdWithIncludesAsync(Guid id);
 	Task<IEnumerable<Course>> GetInstructorCoursesAsync(CourseQueryHandler query, string userId);
 	Task UnlockCourseVideosAsync(Guid id);
+	bool IsInstructorOfCourse(Guid userId, Guid courseId);
 }

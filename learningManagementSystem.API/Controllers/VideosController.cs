@@ -1,5 +1,7 @@
 ﻿
 
+using learningManagementSystem.API.Filter;
+
 namespace learningManagementSystem.API.Controllers;
 
 
@@ -14,8 +16,10 @@ public class VideosController : ControllerBase
 		_videoService = videoService;
 	}
 
-	[HttpGet("GetVideo")]
-	public async Task<ActionResult> GetVideo([FromHeader]Guid id)
+	[HttpGet("GetVideo/{id}")]
+	[Authorize]
+	[ServiceFilter(typeof(AccessVideosFilter))]
+	public async Task<ActionResult> GetVideo(Guid id)
 	{
 		var result = await _videoService.GetByIdWithIncludes(id);
 		if (result is null)
@@ -26,8 +30,9 @@ public class VideosController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpGet("LockAndUnlockVideo")]
-	public async Task<ActionResult> UnlockOrLock([FromHeader] Guid id)
+	[HttpGet("LockAndUnlockVideo/{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> UnlockOrLock(Guid id)
 	{
 		var result = await _videoService.LockOrUnlockAsync(id);
 		if (result is null)
@@ -39,6 +44,7 @@ public class VideosController : ControllerBase
 	}
 
 	[HttpPost]
+	[Authorize(policy: "Instructor")]
 	public async Task<ActionResult> UploadVideos(IEnumerable<UploadVideoDto> videos)
 	{
 		var result = await _videoService.UploadVideosAsync(videos);
@@ -50,8 +56,9 @@ public class VideosController : ControllerBase
 		return StatusCode(201, result);
 	}
 
-	[HttpPut]
-	public async Task<ActionResult> UpdateVideo([FromHeader]Guid id, UpdateVideoDto model)
+	[HttpPut("{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> UpdateVideo([FromRoute]Guid id, UpdateVideoDto model)
 	{
 		var result = await _videoService.UpdateVideoAsync(id, model);
 		if (!result.IsSuccessed)
@@ -62,8 +69,9 @@ public class VideosController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpDelete]
-	public async Task<ActionResult> DeleteVideo([FromHeader] Guid id)
+	[HttpDelete("id")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> DeleteVideo(Guid id)
 	{
 		var result = await _videoService.DeleteVideoAsync(id);
 		if (!result.IsSuccessed)

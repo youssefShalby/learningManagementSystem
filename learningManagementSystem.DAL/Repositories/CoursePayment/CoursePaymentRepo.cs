@@ -2,6 +2,7 @@
 
 
 
+
 namespace learningManagementSystem.DAL.Repositories;
 
 public class CoursePaymentRepo : GenericRepo<CoursePayment>, ICoursePaymentRepo

@@ -9,45 +9,47 @@ namespace learningManagementSystem.API.Controllers;
 public class CoursesController : ControllerBase
 {
 	private readonly ICourseService _courseService;
-	private readonly ICourseRepo cs;
 
-	public CoursesController(ICourseService courseService, ICourseRepo cc)
-    {
+	public CoursesController(ICourseService courseService)
+	{
 		_courseService = courseService;
-		cs = cc;
 	}
 
-	[HttpGet("UnlockVideos")]
-	public async Task<ActionResult> UnlockVideos([FromHeader]Guid id)
+	[HttpGet("UnlockVideos/{LessonId}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> UnlockVideos(Guid LessonId)
 	{
-		var result = await _courseService.UnlockVideos(id);
+		var result = await _courseService.UnlockVideos(LessonId);
 		return Ok(result);
 	}
 
 	[HttpGet("GetAllToShow/{pageNumber}")]
+	[Authorize]
 	public async Task<ActionResult> GetAllToShow(int pageNumber)
 	{
 		var result = await _courseService.GetAllToShowAsync(pageNumber);
-		if(result is null)
-		{
-			return BadRequest(result);
-		}
-		return Ok(result);
-	}	
-	
-	
-	[HttpPost("GetAll")]
-	public async Task<ActionResult> GetAll(CourseQueryHandler query)
-	{
-		var result = await _courseService.GetAllWithQueryAsync(query);
-		if(result is null)
+		if (result is null)
 		{
 			return BadRequest(result);
 		}
 		return Ok(result);
 	}
 
-	[HttpGet("GetCourse")]
+
+	[HttpPost("GetAll")]
+	[Authorize]
+	public async Task<ActionResult> GetAll(CourseQueryHandler query)
+	{
+		var result = await _courseService.GetAllWithQueryAsync(query);
+		if (result is null)
+		{
+			return BadRequest(result);
+		}
+		return Ok(result);
+	}
+
+	[HttpGet("GetCourse/{id}")]
+	[Authorize]
 	public async Task<ActionResult> GetCourseWithIncludes(Guid id)
 	{
 		var result = await _courseService.GetByIdWithIncludesAsync(id);
@@ -59,10 +61,13 @@ public class CoursesController : ControllerBase
 	}
 
 	[HttpPost("StudentCourses")]
-	public async Task<ActionResult> StudentCourses(CourseQueryHandler query, [FromHeader]string userId)
+	[Authorize(policy: "Student")]
+	public async Task<ActionResult> StudentCourses(CourseQueryHandler query)
 	{
-		var result = await _courseService.GetStudentCoursesAsync(query, userId);
-		if(result is null)
+		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+		var result = await _courseService.GetStudentCoursesAsync(query, userId ?? null!);
+		if (result is null)
 		{
 			return BadRequest(result);
 		}
@@ -71,10 +76,13 @@ public class CoursesController : ControllerBase
 
 
 	[HttpPost("InstructorCourses")]
-	public async Task<ActionResult> InstructorCourses(CourseQueryHandler query, [FromHeader]string userId)
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> InstructorCourses(CourseQueryHandler query)
 	{
-		var result = await _courseService.GetInstructorCoursesAsync(query, userId);
-		if(result is null)
+		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+		var result = await _courseService.GetInstructorCoursesAsync(query, userId ?? null!);
+		if (result is null)
 		{
 			return BadRequest(result);
 		}
@@ -82,6 +90,7 @@ public class CoursesController : ControllerBase
 	}
 
 	[HttpPost]
+	[Authorize(policy: "Instructor")]
 	public async Task<ActionResult> Create(CreateCourseDto model)
 	{
 		var result = await _courseService.CreateCourseAsync(model);
@@ -92,8 +101,9 @@ public class CoursesController : ControllerBase
 		return StatusCode(201, result);
 	}
 
-	[HttpPut]
-	public async Task<ActionResult> Update([FromHeader]Guid id, UpdateCourseDto model)
+	[HttpPut("{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> Update([FromRoute] Guid id, UpdateCourseDto model)
 	{
 		var result = await _courseService.UpdateCourseAsync(id, model);
 		if (!result.IsSuccessed)
@@ -102,9 +112,10 @@ public class CoursesController : ControllerBase
 		}
 		return StatusCode(201, result);
 	}
-	
-	[HttpDelete]
-	public async Task<ActionResult> Delete([FromHeader]Guid id)
+
+	[HttpDelete("{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> Delete(Guid id)
 	{
 		var result = await _courseService.DeleteCourseAsync(id);
 		if (!result.IsSuccessed)
@@ -114,8 +125,9 @@ public class CoursesController : ControllerBase
 		return StatusCode(201, result);
 	}
 
-	[HttpDelete("MarkCourseAsDeleted")]
-	public async Task<ActionResult> MarkAsDeleted([FromHeader] Guid id)
+	[HttpDelete("MarkCourseAsDeleted/{id}")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> MarkAsDeleted(Guid id)
 	{
 		var result = await _courseService.MarkCourseAsDeletedAsync(id);
 		if (!result.IsSuccessed)

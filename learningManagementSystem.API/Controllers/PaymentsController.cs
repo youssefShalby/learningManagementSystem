@@ -22,8 +22,12 @@ public class PaymentsController : ControllerBase
 	}
 
 	[HttpPost("CreatePaymentIntent")]
+	[Authorize]
 	public async Task<ActionResult> CreateOrUpdatePaymentIntent(CreateOrUpdatePaymentDto model)
 	{
+		var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+		model.Email = userEmail ?? null!;
+
 		var result = await _paymentService.CreateOrUpdatePaymentIntentAsync(model);
 		if(result is null)
 		{

@@ -6,6 +6,7 @@ namespace learningManagementSystem.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CommentReplyController : ControllerBase
 {
 	private readonly ICommentReplyService _commentReplyService;
@@ -18,6 +19,8 @@ public class CommentReplyController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult> CreateReply(CreateCommentReplyDto model)
 	{
+		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+		model.UserId = userId ?? null!;
 		var result = await _commentReplyService.CreateCommentReplyAsync(model);
 		if (!result.IsSuccessed)
 		{
@@ -26,8 +29,8 @@ public class CommentReplyController : ControllerBase
 		return StatusCode(201, result);
 	}
 
-	[HttpPut]
-	public async Task<ActionResult> UpdateReply([FromHeader]Guid id, UpdateCommentReplyDto model)
+	[HttpPut("{id}")]
+	public async Task<ActionResult> UpdateReply([FromRoute]Guid id, UpdateCommentReplyDto model)
 	{
 		var result = await _commentReplyService.UpdateCommentReplyAsync(id, model);
 		if (!result.IsSuccessed)
@@ -37,8 +40,8 @@ public class CommentReplyController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpDelete]
-	public async Task<ActionResult> DeleteReply([FromHeader] Guid id)
+	[HttpDelete("{id}")]
+	public async Task<ActionResult> DeleteReply(Guid id)
 	{
 		var result = await _commentReplyService.DeleteCommentReplyAsync(id);
 		if (!result.IsSuccessed)
