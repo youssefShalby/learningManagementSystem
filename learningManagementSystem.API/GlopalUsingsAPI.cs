@@ -16,3 +16,6 @@ global using learningManagementSystem.DAL.Queries;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using learningManagementSystem.API.ApiHelper;
+global using learningManagementSystem.API.Errors;
+global using System.Net;
+global using System.Text.Json;
