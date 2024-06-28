@@ -139,7 +139,7 @@ public class EmailService : IEmailService
 ";
 	}
 
-	public string SuccessCourseOrderEmailBody(Course course, string UserName)
+	public string SuccessCourseOrderEmailBody(Course course, string UserName, int studentsNumber)
     {
         return @$"
 
@@ -201,7 +201,8 @@ public class EmailService : IEmailService
                             <h2>{course.Title}</h2>
                             <p><strong>Instructor:</strong> {course.Instructor?.AppUser?.DisplayName ?? "Admin"} </p>
                             <p><strong>Price:</strong> {course.OfferOrice} </p>
-                            <p><strong>students count :</strong> {course.StudentsNumber} </p>
+                            <p><strong>students count :</strong> {studentsNumber} </p>
+                            <p><strong>Lessons count :</strong> {course.Lessons?.Count() ?? 0} </p>
                         </div>
                         <p>We hope you enjoy the course and find it valuable. If you have any questions or need support, please feel free to contact us.</p>
                     </div>

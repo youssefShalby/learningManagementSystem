@@ -75,7 +75,7 @@ public class CourseService : ICourseService
 
 		courses = courses.Where(c => c.IsDeleted == false).ToList();
 
-		return courses.Select(course => CourseMapper.ToGetDto(course));
+		return courses.Select(course => CourseMapper.ToGetDto(course, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id)));
 		
 	}
 
@@ -87,7 +87,7 @@ public class CourseService : ICourseService
 			return null!;
 		}
 
-		return courses.Select(course => CourseMapper.ToGetDto(course));
+		return courses.Select(course => CourseMapper.ToGetDto(course, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id)));
 	}
 
 	public async Task<GetCourseWithIncludesDto> GetByIdWithIncludesAsync(Guid id)
@@ -110,7 +110,7 @@ public class CourseService : ICourseService
 			return null!;
 		}
 
-		return courses.Select(course => CourseMapper.ToGetDto(course));
+		return courses.Select(course => CourseMapper.ToGetDto(course, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id)));
 	}
 
 	public async Task<IEnumerable<GetCourseWithCategoryDto>> GetStudentCoursesAsync(CourseQueryHandler query, string userId)
@@ -122,7 +122,7 @@ public class CourseService : ICourseService
 			return null!;
 		}
 
-		return courses.Select(course => CourseMapper.ToGetDto(course));
+		return courses.Select(course => CourseMapper.ToGetDto(course, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id)));
 	}
 
 	public async Task<CommonResponse> MarkCourseAsDeletedAsync(Guid id)

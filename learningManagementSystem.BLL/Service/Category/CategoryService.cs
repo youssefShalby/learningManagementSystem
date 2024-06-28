@@ -90,7 +90,12 @@ public class CategoryService : ICategoryService
 			return null!;
 		}
 
-		return CategoryMapper.ToCategoryWithCourseDto(category);
+		return new GetCategoryByIdWithIncludesDto
+		{
+			Name = category.Name,
+			Courses = category.Courses?.Select(course => 
+					CourseMapper.ToGetDto(course, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id))).ToList(),
+		};
 	}
 
 	public int GetCategoriesCount()

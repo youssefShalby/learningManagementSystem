@@ -8,5 +8,5 @@ public interface IEmailService
 	Task<CommonResponse> SendEmailAsync(string toEmail, string subject, string body, bool isHtml = false);
 	string GetConfirmationEmailBody(string otp, string userName = "User");
 	string ResetPasswordEmailBody(string url);
-	string SuccessCourseOrderEmailBody(Course course, string UserName);
+	string SuccessCourseOrderEmailBody(Course course, string UserName, int studentsNumber);
 }

@@ -8,21 +8,32 @@ namespace learningManagementSystem.API.Controllers;
 public class CommentsController : ControllerBase
 {
 	private readonly ICommentService _commentService;
+	private readonly ICacheHelper _cacheHelper;
 
-	public CommentsController(ICommentService commentService)
+	public CommentsController(ICommentService commentService, ICacheHelper cacheHelper)
     {
 		_commentService = commentService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpGet("GetCommentReplies/{id}")]
 	[AllowAnonymous]
 	public async Task<ActionResult> GetCommentReplies(Guid id)
 	{
-		var replies = await _commentService.GetCommentRepliesAsync(id);
+		var cacheKey = "GetCommentReplies";
+		var replies = await _cacheHelper.GetDataFromCache<IEnumerable<GetRepliesDto>>(cacheKey);
+		if(replies is not null)
+		{
+			return Ok(replies);
+		}
+
+		replies = await _commentService.GetCommentRepliesAsync(id);
 		if(replies is null)
 		{
 			return NotFound();
 		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, replies);
 
 		return Ok(replies);
 	}

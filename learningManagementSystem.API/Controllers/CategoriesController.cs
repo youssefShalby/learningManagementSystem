@@ -11,21 +11,33 @@ namespace learningManagementSystem.API.Controllers;
 public class CategoriesController : ControllerBase
 {
 	private readonly ICategoryService _categoryService;
+	private readonly ICacheHelper _cacheHelper;
 
-	public CategoriesController(ICategoryService categoryService)
+	public CategoriesController(ICategoryService categoryService, ICacheHelper cacheHelper)
 	{
 		_categoryService = categoryService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpGet("GetAllToShow/{pageNumber}")]
 	[Authorize]
 	public async Task<ActionResult> GetAllToShow(int pageNumber)
 	{
-		var categories = await _categoryService.GetAllAsync(pageNumber);
+		var cacheKey = "GetAllCatToShow";
+
+		var categories = await _cacheHelper.GetDataFromCache<IEnumerable<GetCategoryToShowDto>>(cacheKey);
+		if(categories is not null)
+		{
+			return Ok(categories);
+		}
+
+		categories = await _categoryService.GetAllAsync(pageNumber);
 		if (categories is null)
 		{
 			return NotFound();
 		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, categories);
 
 		return Ok(categories);
 	}
@@ -34,11 +46,20 @@ public class CategoriesController : ControllerBase
 	[Authorize]
 	public async Task<ActionResult> GetAll([FromBody] CategoryQueryHandler query)
 	{
-		var categories = await _categoryService.GetAllByQueryAsync(query);
+		var cacheKey = "GetAllCat";
+		var categories = await _cacheHelper.GetDataFromCache<IEnumerable<GetCategoryToShowDto>>(cacheKey);
+		if (categories is not null)
+		{
+			return Ok(categories);
+		}
+
+		categories = await _categoryService.GetAllByQueryAsync(query);
 		if (categories is null)
 		{
 			return NotFound();
 		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, categories);
 
 		return Ok(categories);
 	}
@@ -47,11 +68,20 @@ public class CategoriesController : ControllerBase
 	[Authorize]
 	public async Task<ActionResult> GetById(Guid id)
 	{
-		var category = await _categoryService.GetByIdWithIncludesAsync(id);
+		var cacheKey = "GetCatById";
+		var category = await _cacheHelper.GetDataFromCache<GetCategoryByIdWithIncludesDto>(cacheKey);
+		if (category is not null)
+		{
+			return Ok(category);
+		}
+
+		category = await _categoryService.GetByIdWithIncludesAsync(id);
 		if (category is null)
 		{
 			return NotFound();
 		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, category);
 
 		return Ok(category);
 	}

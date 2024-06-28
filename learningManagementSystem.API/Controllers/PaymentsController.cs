@@ -12,12 +12,14 @@ public class PaymentsController : ControllerBase
 {
 	private readonly IPaymentService _paymentService;
 	private readonly StripeSettings _stripeSettings;
+	private readonly IWebHostEnvironment _env;
 	private readonly string _webHooks;
 
-	public PaymentsController(IPaymentService paymentService, StripeSettings stripeSettings)
+	public PaymentsController(IPaymentService paymentService, StripeSettings stripeSettings, IWebHostEnvironment env)
     {
 		_paymentService = paymentService;
 		_stripeSettings = stripeSettings;
+		_env = env;
 		_webHooks = _stripeSettings.WebHooksSecret;
 	}
 
@@ -39,6 +41,10 @@ public class PaymentsController : ControllerBase
 	[HttpPost("TestPaymentSuccess")]
 	public async Task<ActionResult> TestPaymentSucess([FromHeader] string email, [FromHeader] string paymentIntentId)
 	{
+		if(!_env.IsDevelopment())
+		{
+			return Forbid("you don't have access for this endpoint, and this endpoint work on loacal only");
+		}
 		return Ok(await _paymentService.UpdateCourseWhenPaymentSuccessAsync(paymentIntentId, email));
 	}
 

@@ -165,7 +165,7 @@ public class PaymentService : IPaymentService
 		int studentsNumber =  _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id);
 
 		//> send email payment success
-		var emailBody = _emailService.SuccessCourseOrderEmailBody(course, user.DisplayName);
+		var emailBody = _emailService.SuccessCourseOrderEmailBody(course, user.DisplayName, _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id));
 		await _emailService.SendEmailAsync(user.Email, "Course Purchase Success", emailBody, true);
 
 		return CourseMapper.ToGetWithIncludesDto(course, studentsNumber);

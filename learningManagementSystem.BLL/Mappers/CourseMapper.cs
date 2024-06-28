@@ -4,7 +4,7 @@ namespace learningManagementSystem.BLL.Mappers;
 
 public class CourseMapper
 {
-	public static GetCourseWithCategoryDto ToGetDto(Course course)
+	public static GetCourseWithCategoryDto ToGetDto(Course course, int studentsNumber)
 	{
 		return new GetCourseWithCategoryDto
 		{
@@ -12,7 +12,7 @@ public class CourseMapper
 			ImgeUrl = course.ImgeUrl,
 			OfferOrice = course.OfferOrice,
 			OriginalOrice = course.OriginalOrice,
-			StudentsNumber = course.StudentsNumber,
+			StudentsNumber = studentsNumber,
 			Title = course.Title,
 		};
 	}

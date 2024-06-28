@@ -113,7 +113,7 @@ public class VideoService : IVideoService
 
 			await _unitOfWork.VideoRepo.CreateRangeAsync(newVideos);
 			await _unitOfWork.VideoRepo.SaveChangesAsync();
-			return new CommonResponse("video uploaded..!!", true);
+			return new CommonResponse("videos uploaded..!!", true);
 		}
 		catch (Exception ex)
 		{

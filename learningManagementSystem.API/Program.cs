@@ -56,6 +56,7 @@ builder.Services.AddScoped<ICommentReplyService, CommentReplyService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICacheHelper, CacheHelper>();
 
 builder.Services.AddScoped<AccessVideosFilter>();
 

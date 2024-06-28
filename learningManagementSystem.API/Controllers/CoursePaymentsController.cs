@@ -10,22 +10,33 @@ namespace learningManagementSystem.API.Controllers;
 public class CoursePaymentsController : ControllerBase
 {
 	private readonly ICoursePaymentService _coursePaymentService;
+	private readonly ICacheHelper _cacheHelper;
 
-	public CoursePaymentsController(ICoursePaymentService coursePaymentService)
+	public CoursePaymentsController(ICoursePaymentService coursePaymentService, ICacheHelper cacheHelper)
     {
 		_coursePaymentService = coursePaymentService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpGet("GetCourse/{id}")]
 	public async Task<ActionResult> GetById(Guid id)
 	{
-		var result = await _coursePaymentService.GetByIdAsync(id);
-		if(result is null)
+		var cacheKey = "GetCourseForPayment";
+		var course = await _cacheHelper.GetDataFromCache<GetCoursePaymentDto>(cacheKey);
+		course = await _coursePaymentService.GetByIdAsync(id);
+		if(course is not null)
+		{
+			return Ok(course);
+		}
+
+		if(course is null)
 		{
 			return NotFound("not found");
 		}
 
-		return Ok(result);
+		await _cacheHelper.SetDataInCache(cacheKey, course);
+
+		return Ok(course);
 	}
 
 	[HttpPost]

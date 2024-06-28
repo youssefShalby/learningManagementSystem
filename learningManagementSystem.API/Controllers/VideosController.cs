@@ -10,10 +10,12 @@ namespace learningManagementSystem.API.Controllers;
 public class VideosController : ControllerBase
 {
 	private readonly IVideoService _videoService;
+	private readonly ICacheHelper _cacheHelper;
 
-	public VideosController(IVideoService videoService)
+	public VideosController(IVideoService videoService, ICacheHelper cacheHelper)
     {
 		_videoService = videoService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpGet("GetVideo/{id}")]
@@ -21,13 +23,22 @@ public class VideosController : ControllerBase
 	[ServiceFilter(typeof(AccessVideosFilter))]
 	public async Task<ActionResult> GetVideo(Guid id)
 	{
-		var result = await _videoService.GetByIdWithIncludes(id);
-		if (result is null)
+		var cacheKey = "GetVideo";
+		var video = await _cacheHelper.GetDataFromCache<GetVideoByIdWithIncludesDto>(cacheKey);
+		if(video is not null)
+		{
+			return Ok(video);
+		}
+
+		video = await _videoService.GetByIdWithIncludes(id);
+		if (video is null)
 		{
 			return BadRequest("video not found");
 		}
 
-		return Ok(result);
+		await _cacheHelper.SetDataInCache(cacheKey, video);
+
+		return Ok(video);
 	}
 
 	[HttpGet("LockAndUnlockVideo/{id}")]

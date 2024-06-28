@@ -8,21 +8,33 @@ namespace learningManagementSystem.API.Controllers;
 public class LessonsController : ControllerBase
 {
 	private readonly ILessonService _lessonService;
+	private readonly ICacheHelper _cacheHelper;
 
-	public LessonsController(ILessonService lessonService)
+	public LessonsController(ILessonService lessonService, ICacheHelper cacheHelper)
     {
 		_lessonService = lessonService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpGet("LessonVideos/{id}")]
 	public async Task<ActionResult> GetVideos(Guid id)
 	{
-		var vidoes = await _lessonService.GetVideosOfLessonAsync(id);
-		if(vidoes is null)
+		var cacheKey = "GetLessonVideos";
+		var videos = await _cacheHelper.GetDataFromCache<IEnumerable<GetVideoForLessonDto>>(cacheKey);
+		if(videos is not null)
+		{
+			return Ok(videos);
+		}
+
+		videos = await _lessonService.GetVideosOfLessonAsync(id);
+		if(videos is null)
 		{
 			return NotFound();
 		}
-		return Ok(vidoes);
+
+		await _cacheHelper.SetDataInCache(cacheKey, videos);
+
+		return Ok(videos);
 	}
 
 	[HttpPost]

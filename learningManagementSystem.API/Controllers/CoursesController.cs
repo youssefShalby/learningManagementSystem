@@ -9,10 +9,12 @@ namespace learningManagementSystem.API.Controllers;
 public class CoursesController : ControllerBase
 {
 	private readonly ICourseService _courseService;
+	private readonly ICacheHelper _cacheHelper;
 
-	public CoursesController(ICourseService courseService)
+	public CoursesController(ICourseService courseService, ICacheHelper cacheHelper)
 	{
 		_courseService = courseService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpGet("UnlockVideos/{LessonId}")]
@@ -27,12 +29,22 @@ public class CoursesController : ControllerBase
 	[Authorize]
 	public async Task<ActionResult> GetAllToShow(int pageNumber)
 	{
-		var result = await _courseService.GetAllToShowAsync(pageNumber);
-		if (result is null)
+		var cacheKey = "GetAllCoursesToShow";
+		var courses = await _cacheHelper.GetDataFromCache<IEnumerable<GetCourseWithCategoryDto>>(cacheKey);
+		if(courses is not null)
 		{
-			return BadRequest(result);
+			return Ok(courses);
 		}
-		return Ok(result);
+
+		courses = await _courseService.GetAllToShowAsync(pageNumber);
+		if (courses is null)
+		{
+			return BadRequest(courses);
+		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, courses);
+
+		return Ok(courses);
 	}
 
 
@@ -40,24 +52,44 @@ public class CoursesController : ControllerBase
 	[Authorize]
 	public async Task<ActionResult> GetAll(CourseQueryHandler query)
 	{
-		var result = await _courseService.GetAllWithQueryAsync(query);
-		if (result is null)
+		var cacheKey = "GetAllCoursesWithQuery";
+		var courses = await _cacheHelper.GetDataFromCache<IEnumerable<GetCourseWithCategoryDto>>(cacheKey);
+		if(courses is not null)
 		{
-			return BadRequest(result);
+			return Ok(courses);
 		}
-		return Ok(result);
+
+		courses = await _courseService.GetAllWithQueryAsync(query);
+		if (courses is null)
+		{
+			return BadRequest(courses);
+		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, courses);
+
+		return Ok(courses);
 	}
 
 	[HttpGet("GetCourse/{id}")]
 	[Authorize]
 	public async Task<ActionResult> GetCourseWithIncludes(Guid id)
 	{
-		var result = await _courseService.GetByIdWithIncludesAsync(id);
-		if (result is null)
+		var cacheKey = "GetCourseWithInclude";
+		var course = await _cacheHelper.GetDataFromCache<GetCourseWithIncludesDto>(cacheKey);
+		if(course is not null)
 		{
-			return BadRequest(result);
+			return Ok(course);
 		}
-		return Ok(result);
+
+		course = await _courseService.GetByIdWithIncludesAsync(id);
+		if (course is null)
+		{
+			return BadRequest(course);
+		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, course);
+
+		return Ok(course);
 	}
 
 	[HttpPost("StudentCourses")]
@@ -66,12 +98,22 @@ public class CoursesController : ControllerBase
 	{
 		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-		var result = await _courseService.GetStudentCoursesAsync(query, userId ?? null!);
-		if (result is null)
+		var cacheKey = "GetStudentCourses";
+		var courses = await _cacheHelper.GetDataFromCache<IEnumerable<GetCourseWithCategoryDto>>(cacheKey);
+		if(courses is not null)
 		{
-			return BadRequest(result);
+			return Ok(courses);
 		}
-		return Ok(result);
+
+		courses = await _courseService.GetStudentCoursesAsync(query, userId ?? null!);
+		if (courses is null)
+		{
+			return BadRequest(courses);
+		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, courses);
+
+		return Ok(courses);
 	}
 
 
@@ -81,12 +123,22 @@ public class CoursesController : ControllerBase
 	{
 		var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-		var result = await _courseService.GetInstructorCoursesAsync(query, userId ?? null!);
-		if (result is null)
+		var cacheKey = "GetInstructorCourses";
+		var courses = await _cacheHelper.GetDataFromCache<IEnumerable<GetCourseWithCategoryDto>>(cacheKey);
+		if (courses is not null)
 		{
-			return BadRequest(result);
+			return Ok(courses);
 		}
-		return Ok(result);
+
+		courses = await _courseService.GetInstructorCoursesAsync(query, userId ?? null!);
+		if (courses is null)
+		{
+			return BadRequest(courses);
+		}
+
+		await _cacheHelper.SetDataInCache(cacheKey, courses);
+
+		return Ok(courses);
 	}
 
 	[HttpPost("EnrollStudent")]

@@ -15,3 +15,4 @@ global using System.Text;
 global using learningManagementSystem.DAL.Queries;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc.Filters;
+global using learningManagementSystem.API.ApiHelper;

@@ -13,15 +13,17 @@ public class AdminDashboardController : ControllerBase
 	private readonly IOrderService _orderService;
 	private readonly ICourseService _courseService;
 	private readonly ICategoryService _categoryService;
+	private readonly ICacheHelper _cacheHelper;
 
 	public AdminDashboardController(IUserDashboardService userService, IRoleService roleService, 
-			IOrderService orderService, ICourseService courseService, ICategoryService categoryService)
+			IOrderService orderService, ICourseService courseService, ICategoryService categoryService, ICacheHelper cacheHelper)
     {
 		_userService = userService;
 		_roleService = roleService;
 		_courseService = courseService;
 		_categoryService = categoryService;
 		_orderService = orderService;
+		_cacheHelper = cacheHelper;
 	}
 
 	[HttpPost("AssignRoleAdmintIntoUser")]
@@ -47,7 +49,7 @@ public class AdminDashboardController : ControllerBase
 	}
 
 	[HttpDelete("RemoveRole")]
-	public async Task<ActionResult> CreateRole([FromHeader] string name)
+	public async Task<ActionResult> RemoveRole([FromHeader] string name)
 	{
 		var result = await _roleService.RemoveRoleAsync(name);
 		if (result.IsSuccessed)
@@ -60,56 +62,108 @@ public class AdminDashboardController : ControllerBase
 	[HttpPost("GetUser")]
 	public async Task<ActionResult> GetUser([FromHeader]string userNameOrEmail)
 	{
-		var result = await _userService.GetUserByEmailOrUserNameAsync(userNameOrEmail);
-		if (result is null)
+		var cacheKey = "GetUserFromDash";
+		var user = await _cacheHelper.GetDataFromCache<GetUserDto>(cacheKey);
+		if(user is not null)
+		{
+			return Ok(user);
+		}
+
+		user = await _userService.GetUserByEmailOrUserNameAsync(userNameOrEmail);
+		if (user is null)
 		{
 			return NotFound(); 
 		}
-		return Ok(result);
+
+		//> add in cache
+		await _cacheHelper.SetDataInShortTimeCache(cacheKey, user);
+
+		return Ok(user);
 	}
 
 	[HttpGet("GetOrdersForLastMonth")]
 	public async Task<ActionResult> GetOrdersForLastMonth([FromHeader] int pageNumber)
 	{
-		var result = await _orderService.GetOrdersOfLastMonthAsync(pageNumber);
-		if (result is null)
+		var cacheKey = "GtOrdrsForLstMonth";
+
+		var orders = await _cacheHelper.GetDataFromCache<IEnumerable<GetOrderDto>>(cacheKey);
+		if(orders is not null)
+		{
+			return Ok(orders);
+		}
+
+		orders = await _orderService.GetOrdersOfLastMonthAsync(pageNumber);
+		if (orders is null)
 		{
 			return NotFound("there are no orders for last month..!!");
 		}
-		return Ok(result);
+
+		await _cacheHelper.SetDataInCache(cacheKey, orders);
+
+		return Ok(orders);
 	}
 
 	[HttpGet("GetOrdersForLastYear")]
 	public async Task<ActionResult> GetOrdersForLastYear([FromHeader] int pageNumber)
 	{
-		var result = await _orderService.GetOrdersOfLastYearAsync(pageNumber);
-		if (result is null)
+		var cacheKey = "GtOrdrsForLstYer";
+		var orders = await _cacheHelper.GetDataFromCache<IEnumerable<GetOrderDto>>(cacheKey);
+		if(orders is not null)
+		{
+			return Ok(orders);
+		}
+
+		orders = await _orderService.GetOrdersOfLastYearAsync(pageNumber);
+		if (orders is null)
 		{
 			return NotFound("there are no orders for last year..!!");
 		}
-		return Ok(result);
+
+		await _cacheHelper.SetDataInShortTimeCache(cacheKey, orders);
+
+		return Ok(orders);
 	}
 
 	[HttpGet("GetCoursesForLastMonth")]
 	public async Task<ActionResult> GetCoursesForLastMonth([FromHeader] int pageNumber)
 	{
-		var result = await _courseService.GetCoursesOfLastMonthAsync(pageNumber);
-		if (result is null)
+		var cacheKey = "GetCoursesForLastMonth";
+		var courses = await _cacheHelper.GetDataFromCache<IEnumerable<GetCourseToAdminDashDto>>(cacheKey);
+		if(courses is not null)
+		{
+			return Ok(courses);
+		}
+
+		courses = await _courseService.GetCoursesOfLastMonthAsync(pageNumber);
+		if (courses is null)
 		{
 			return NotFound("there are no courses for last month..!!");
 		}
-		return Ok(result);
+
+		await _cacheHelper.SetDataInShortTimeCache(cacheKey, courses);
+
+		return Ok(courses);
 	}
 
 	[HttpGet("GetCoursesForLastYear")]
 	public async Task<ActionResult> GetCoursesForLastYear([FromHeader] int pageNumber)
 	{
-		var result = await _courseService.GetCoursesOfLastYearAsync(pageNumber);
-		if (result is null)
+		var cacheKey = "GetCoursesForLastYear";
+		var courses = await _cacheHelper.GetDataFromCache<IEnumerable<GetCourseToAdminDashDto>>(cacheKey);
+		if(courses is not null)
+		{
+			return Ok(courses);
+		}
+
+		courses = await _courseService.GetCoursesOfLastYearAsync(pageNumber);
+		if (courses is null)
 		{
 			return NotFound("there are no courses for last year..!!");
 		}
-		return Ok(result);
+
+		await _cacheHelper.SetDataInShortTimeCache(cacheKey, courses);
+
+		return Ok(courses);
 	}
 
 	[HttpGet("GetAppInfo")]
@@ -147,7 +201,7 @@ public class AdminDashboardController : ControllerBase
 	}
 
 	[HttpPost("UnBlockUser")]
-	public async Task<ActionResult> BlcokUser([FromHeader]string email)
+	public async Task<ActionResult> UnBlcokUser([FromHeader]string email)
 	{
 		var result = await _userService.UnBlockUserForPeriodAsync(email);
 		if (!result.IsSuccessed)
