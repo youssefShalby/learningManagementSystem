@@ -19,3 +19,8 @@ global using learningManagementSystem.API.ApiHelper;
 global using learningManagementSystem.API.Errors;
 global using System.Net;
 global using System.Text.Json;
+global using learningManagementSystem.API.Filter;
+global using Microsoft.OpenApi.Models;
+global using learningManagementSystem.API.Middlewares;
+
+

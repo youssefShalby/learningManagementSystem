@@ -3,7 +3,7 @@
 
 namespace learningManagementSystem.BLL.Service;
 
-public class OrderService : IOrderService
+public class OrderService : IOrderService, IOrderDashboardService
 {
 	private readonly IUnitOfWork _unitOfWork;
 
@@ -14,17 +14,17 @@ public class OrderService : IOrderService
 
 	public int GetOrdersCount()
 	{
-		return _unitOfWork.OrderRepo.GetOrdersCount();
+		return _unitOfWork.OrderDashboardRepo.GetOrdersCount();
 	}
 
 	public int GetOrdersCountOfLastMonth()
 	{
-		return _unitOfWork.OrderRepo.GetOrdersCountOfLastMonth();
+		return _unitOfWork.OrderDashboardRepo.GetOrdersCountOfLastMonth();
 	}
 
 	public int GetOrdersCountOfLastYear()
 	{
-		return _unitOfWork.OrderRepo.GetOrdersCountOfLastYear();
+		return _unitOfWork.OrderDashboardRepo.GetOrdersCountOfLastYear();
 	}
 
 	public async Task<IEnumerable<GetOrderDto>> GetOrdersOfLastMonthAsync(int pageNumber)

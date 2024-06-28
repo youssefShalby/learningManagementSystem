@@ -9,8 +9,4 @@ public interface IOrderRepo : IGenericRepo<Order>
 	bool HasPurchasedCourse(Guid userId, Guid courseId);
 	Task<IEnumerable<Order>> GetOrdersOfLastMonthAsync(int pageNumber);
 	Task<IEnumerable<Order>> GetOrdersOfLastYearAsync(int pageNumber);
-
-	public int GetOrdersCountOfLastYear();
-	public int GetOrdersCountOfLastMonth();
-	public int GetOrdersCount();
 }

@@ -4,7 +4,7 @@
 
 namespace learningManagementSystem.DAL.Repositories;
 
-public class OrderRepo : GenericRepo<Order>, IOrderRepo
+public class OrderRepo : GenericRepo<Order>, IOrderRepo, IOrderDashboardRepo
 {
 	private readonly AppDbContext _context;
 	private readonly IConfiguration _configuration;

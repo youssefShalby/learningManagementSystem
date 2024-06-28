@@ -5,7 +5,7 @@
 
 namespace learningManagementSystem.BLL.Service;
 
-public class CourseService : ICourseService
+public class CourseService : ICourseService, ICourseDashboardService, ICourseAccessService
 {
 	private readonly IUnitOfWork _unitOfWork;
 
@@ -225,17 +225,17 @@ public class CourseService : ICourseService
 
 	public int GetCoursesCountOfLastYear()
 	{
-		return _unitOfWork.CourseRepo.GetCoursesCountOfLastYear();
+		return _unitOfWork.CourseDashboardRepo.GetCoursesCountOfLastYear();
 	}
 
 	public int GetCoursesCountOfLastMonth()
 	{
-		return _unitOfWork.CourseRepo.GetCoursesCountOfLastMonth();
+		return _unitOfWork.CourseDashboardRepo.GetCoursesCountOfLastMonth();
 	}
 
 	public int GetCoursesCount()
 	{
-		return _unitOfWork.CourseRepo.GetCoursesCount();
+		return _unitOfWork.CourseDashboardRepo.GetCoursesCount();
 	}
 
 	public async Task<CommonResponse> EnrollStudentToCourseAsync(EnrollStudentToCourseDto model)

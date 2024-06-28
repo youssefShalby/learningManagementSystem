@@ -16,4 +16,5 @@ global using System.Text.Json.Serialization;
 global using learningManagementSystem.BLL.Mappers;
 global using learningManagementSystem.DAL.Queries;
 global using Microsoft.AspNetCore.WebUtilities;
+global using Microsoft.EntityFrameworkCore;
 

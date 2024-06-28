@@ -1,7 +1,5 @@
 ﻿
 
-using Microsoft.EntityFrameworkCore;
-
 namespace learningManagementSystem.BLL.Service;
 
 public class UserService : IUserService, IUserDashboardService, IUserAccountManagmentService

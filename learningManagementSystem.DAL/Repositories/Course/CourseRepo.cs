@@ -3,7 +3,7 @@
 
 namespace learningManagementSystem.DAL.Repositories;
 
-public class CourseRepo : GenericRepo<Course>, ICourseRepo
+public class CourseRepo : GenericRepo<Course>, ICourseRepo, ICourseDashboardRepo
 {
 	private readonly AppDbContext _context;
 	private readonly IConfiguration _configuration;

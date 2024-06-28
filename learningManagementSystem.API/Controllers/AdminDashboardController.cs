@@ -14,16 +14,21 @@ public class AdminDashboardController : ControllerBase
 	private readonly ICourseService _courseService;
 	private readonly ICategoryService _categoryService;
 	private readonly ICacheHelper _cacheHelper;
+	private readonly IOrderDashboardService _orderDashboardService;
+	private readonly ICourseDashboardService _courseDashboardService;
 
 	public AdminDashboardController(IUserDashboardService userService, IRoleService roleService, 
-			IOrderService orderService, ICourseService courseService, ICategoryService categoryService, ICacheHelper cacheHelper)
-    {
+			IOrderService orderService, ICourseService courseService, ICategoryService categoryService, ICacheHelper cacheHelper
+,			IOrderDashboardService orderDashboardService, ICourseDashboardService courseDashboardService)
+	{
 		_userService = userService;
 		_roleService = roleService;
 		_courseService = courseService;
 		_categoryService = categoryService;
 		_orderService = orderService;
 		_cacheHelper = cacheHelper;
+		_orderDashboardService = orderDashboardService;
+		_courseDashboardService = courseDashboardService;
 	}
 
 	[HttpPost("AssignRoleAdmintIntoUser")]
@@ -134,7 +139,7 @@ public class AdminDashboardController : ControllerBase
 			return Ok(courses);
 		}
 
-		courses = await _courseService.GetCoursesOfLastMonthAsync(pageNumber);
+		courses = await _courseDashboardService.GetCoursesOfLastMonthAsync(pageNumber);
 		if (courses is null)
 		{
 			return NotFound("there are no courses for last month..!!");
@@ -155,7 +160,7 @@ public class AdminDashboardController : ControllerBase
 			return Ok(courses);
 		}
 
-		courses = await _courseService.GetCoursesOfLastYearAsync(pageNumber);
+		courses = await _courseDashboardService.GetCoursesOfLastYearAsync(pageNumber);
 		if (courses is null)
 		{
 			return NotFound("there are no courses for last year..!!");
@@ -173,13 +178,13 @@ public class AdminDashboardController : ControllerBase
 		var UnblockedUserCount = _userService.GetUsersNumber();
 		return new GetAppInfoDto
 		{
-			CorsesCountOfLastMonth = _courseService.GetCoursesCountOfLastMonth(),
-			CorsesCountOfLastYear = _courseService.GetCoursesCountOfLastYear(),
-			OrdersCountOfLastMonth = _orderService.GetOrdersCountOfLastMonth(),
-			OrdersCountOfLastYear = _orderService.GetOrdersCountOfLastYear(),
+			CorsesCountOfLastMonth = _courseDashboardService.GetCoursesCountOfLastMonth(),
+			CorsesCountOfLastYear = _courseDashboardService.GetCoursesCountOfLastYear(),
+			OrdersCountOfLastMonth = _orderDashboardService.GetOrdersCountOfLastMonth(),
+			OrdersCountOfLastYear = _orderDashboardService.GetOrdersCountOfLastYear(),
 			AllCategoriesCount = _categoryService.GetCategoriesCount(),
-			AllCoursesCount = _courseService.GetCoursesCount(),
-			AllOrdersCount = _orderService.GetOrdersCount(),
+			AllCoursesCount = _courseDashboardService.GetCoursesCount(),
+			AllOrdersCount = _orderDashboardService.GetOrdersCount(),
 			AppUsersCount = _userService.GetUsersNumber(),
 			BlockedUserCount = await _userService.GetBockedUsersCountAsync(),
 			UnBlockedUserCount = Math.Abs(UnblockedUserCount - blockedUserCount),

@@ -9,12 +9,14 @@ namespace learningManagementSystem.API.Controllers;
 public class CoursesController : ControllerBase
 {
 	private readonly ICourseService _courseService;
+	private readonly ICourseAccessService _courseAccessService;
 	private readonly ICacheHelper _cacheHelper;
 
-	public CoursesController(ICourseService courseService, ICacheHelper cacheHelper)
+	public CoursesController(ICourseService courseService, ICacheHelper cacheHelper, ICourseAccessService courseAccessService)
 	{
 		_courseService = courseService;
 		_cacheHelper = cacheHelper;
+		_courseAccessService = courseAccessService;
 	}
 
 	[HttpGet("UnlockVideos/{LessonId}")]
@@ -36,7 +38,7 @@ public class CoursesController : ControllerBase
 			return Ok(courses);
 		}
 
-		courses = await _courseService.GetAllToShowAsync(pageNumber);
+		courses = await _courseAccessService.GetAllToShowAsync(pageNumber);
 		if (courses is null)
 		{
 			return BadRequest(courses);
@@ -59,7 +61,7 @@ public class CoursesController : ControllerBase
 			return Ok(courses);
 		}
 
-		courses = await _courseService.GetAllWithQueryAsync(query);
+		courses = await _courseAccessService.GetAllWithQueryAsync(query);
 		if (courses is null)
 		{
 			return BadRequest(courses);
@@ -81,7 +83,7 @@ public class CoursesController : ControllerBase
 			return Ok(course);
 		}
 
-		course = await _courseService.GetByIdWithIncludesAsync(id);
+		course = await _courseAccessService.GetByIdWithIncludesAsync(id);
 		if (course is null)
 		{
 			return BadRequest(course);
@@ -105,7 +107,7 @@ public class CoursesController : ControllerBase
 			return Ok(courses);
 		}
 
-		courses = await _courseService.GetStudentCoursesAsync(query, userId ?? null!);
+		courses = await _courseAccessService.GetStudentCoursesAsync(query, userId ?? null!);
 		if (courses is null)
 		{
 			return BadRequest(courses);
@@ -130,7 +132,7 @@ public class CoursesController : ControllerBase
 			return Ok(courses);
 		}
 
-		courses = await _courseService.GetInstructorCoursesAsync(query, userId ?? null!);
+		courses = await _courseAccessService.GetInstructorCoursesAsync(query, userId ?? null!);
 		if (courses is null)
 		{
 			return BadRequest(courses);
