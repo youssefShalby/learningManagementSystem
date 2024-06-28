@@ -8,6 +8,7 @@ public class AppUserTypeConfiguration : IEntityTypeConfiguration<ApplicationUser
 	{
 		modelBuilder.HasKey(AU => AU.Id);
 		modelBuilder.Property(U => U.DisplayName).IsRequired().HasMaxLength(80);
+		modelBuilder.Property(U => U.UserName).IsRequired().HasMaxLength(80);
 
 		modelBuilder.OwnsOne(U => U.Address, address =>
 		{

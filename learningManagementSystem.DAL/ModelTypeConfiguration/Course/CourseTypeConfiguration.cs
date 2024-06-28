@@ -10,7 +10,6 @@ public class CourseTypeConfiguration : IEntityTypeConfiguration<Course>
 		modelBuilder.Property(C => C.Title).IsRequired().HasMaxLength(100);
 		modelBuilder.Property(C => C.Description).HasMaxLength(150);
 		modelBuilder.Property(C => C.Details).HasMaxLength(250);
-		modelBuilder.Property(C => C.Details).HasMaxLength(250);
 		modelBuilder.Property(C => C.OriginalOrice).HasColumnType("decimal(18, 2)");
 		modelBuilder.Property(C => C.OfferOrice).HasColumnType("decimal(18, 2)");
 

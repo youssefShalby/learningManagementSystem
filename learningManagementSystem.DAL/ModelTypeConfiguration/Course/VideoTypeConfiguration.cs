@@ -1,4 +1,4 @@
-﻿
+﻿	
 namespace learningManagementSystem.DAL.ModelTypeConfiguration;
 
 public class VideoTypeConfiguration : IEntityTypeConfiguration<Video>

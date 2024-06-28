@@ -3,11 +3,11 @@
 public class ResetPasswordDto
 {
 
-	[EmailAddress, Required]
+	[EmailAddress(ErrorMessage = "This is not valid email address")]
+	[Required(ErrorMessage = "Enter email address is required..!")]
 	public string Email { get; set; } = string.Empty;
 
-	[Required, MinLength(5, ErrorMessage = "so short password"), MaxLength(80, ErrorMessage = "so long password")]
-	public string NewPassword { get; set; } = string.Empty;
+	public string NewPassword { get; set; } = string.Empty; //> validation already in service registeration
 
 	[Required, Compare(nameof(NewPassword))]
 	public string ConfirmPassword { get; set; } = string.Empty;
