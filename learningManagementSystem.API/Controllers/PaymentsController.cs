@@ -36,6 +36,12 @@ public class PaymentsController : ControllerBase
 		return Ok(result);
 	}
 
+	[HttpPost("TestPaymentSuccess")]
+	public async Task<ActionResult> TestPaymentSucess([FromHeader] string email, [FromHeader] string paymentIntentId)
+	{
+		return Ok(await _paymentService.UpdateCourseWhenPaymentSuccessAsync(paymentIntentId, email));
+	}
+
 	[HttpPost("webhook")]
 	public async Task<ActionResult> StripeWebHook([FromHeader] string userEmail)
 	{

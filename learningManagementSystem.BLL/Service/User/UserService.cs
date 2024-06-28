@@ -225,12 +225,25 @@ public class UserService : IUserService, IUserDashboardService, IUserAccountMana
 		{
 			var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(user.Id);
 			_unitOfWork.StudentRepo.Delete(student);
+			_unitOfWork.StudentRepo.SaveChanges();
 		}
 		
 		if(await _unitOfWork.UserManager.IsInRoleAsync(user, "Instructor"))
 		{
 			var instructor = await _unitOfWork.InstructorRepo.GetByRefIdAsync(user.Id);
+
+			//> check if instructor has courses
+			int coursesCount = _unitOfWork.CourseRepo.GetInstructorCoursesCount(instructor.Id);
+			if(coursesCount > 0)
+			{
+				return new CommonResponse("your account have courses and may students enrolled into your courses, so we can't delete your account", false);
+			}
+
+			//> delete account if have no created courses
+			await _unitOfWork.CourseRepo.DeleteInstrutorCourses(instructor.Id);
+
 			_unitOfWork.InstructorRepo.Delete(instructor);
+			_unitOfWork.InstructorRepo.SaveChanges();
 		}
 
 		await LogoutAsync(user.Email);

@@ -13,6 +13,8 @@ public interface ICourseService
 	Task<CommonResponse> CreateCourseAsync(CreateCourseDto model, string userId);
 	Task<CommonResponse> UpdateCourseAsync(Guid id, UpdateCourseDto model);
 	Task<CommonResponse> DeleteCourseAsync(Guid id);
+	Task<CommonResponse> EnrollStudentToCourseAsync(EnrollStudentToCourseDto model);
+	Task<CommonResponse> OutStudentFromCourseAsync(OutUserFromCourseDto model);
 
 	//> admin dashbaoard endpoints services
 	Task<CommonResponse> MarkCourseAsDeletedAsync(Guid id);

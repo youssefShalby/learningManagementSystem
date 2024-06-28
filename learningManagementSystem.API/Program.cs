@@ -39,6 +39,8 @@ builder.Services.AddScoped<IHandlerService, HandlerService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserDashboardService, UserService>();
+builder.Services.AddScoped<IUserAccountManagmentService, UserService>();
 builder.Services.AddScoped<IStudentRepo, StudentRepo>();
 builder.Services.AddScoped<ICommentRelyRepo, CommentRelyRepo>();
 builder.Services.AddScoped<IVideoRepo, VideoRepo>();

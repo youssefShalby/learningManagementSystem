@@ -8,7 +8,7 @@ public interface ICourseRepo : IGenericRepo<Course>
 	Task<Course> GetByIdWithIncludesAsync(Guid id);
 	Task<IEnumerable<Course>> GetInstructorCoursesAsync(CourseQueryHandler query, Guid instructorId);
 	Task UnlockCourseVideosAsync(Guid id);
-
+	Task DeleteInstrutorCourses(Guid instructorId);
 	Task<IEnumerable<Course>> GetCoursesOfLastMonthAsync(int pageNumber);
 	Task<IEnumerable<Course>> GetCoursesOfLastYearAsync(int pageNumber);
 	public int GetCoursesCountOfLastYear();

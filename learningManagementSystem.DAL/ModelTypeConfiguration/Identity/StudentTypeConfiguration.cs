@@ -12,6 +12,7 @@ public class StudentTypeConfiguration : IEntityTypeConfiguration<Student>
 
 		modelBuilder.HasMany(U => U.StudentCourses)
 			.WithOne(SC => SC.Student)
-			.HasForeignKey(US => US.StudentId);
+			.HasForeignKey(US => US.StudentId)
+			.OnDelete(DeleteBehavior.Cascade);
 	}
 }

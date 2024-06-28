@@ -115,7 +115,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Comment", b =>
@@ -149,7 +149,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("VideoId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.CommentReply", b =>
@@ -178,7 +178,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommentReplies");
+                    b.ToTable("CommentReplies", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Course", b =>
@@ -232,7 +232,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("InstructorId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.CourseAdvantage", b =>
@@ -253,7 +253,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CourseAdvantages");
+                    b.ToTable("CourseAdvantages", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.CoursePayment", b =>
@@ -277,7 +277,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CoursePayments");
+                    b.ToTable("CoursePayments", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Instructor", b =>
@@ -293,7 +293,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("UserRefId");
 
-                    b.ToTable("Instructors");
+                    b.ToTable("Instructors", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Lesson", b =>
@@ -323,7 +323,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Lessons");
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Order", b =>
@@ -362,7 +362,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Student", b =>
@@ -378,7 +378,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("UserRefId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.StudentCourse", b =>
@@ -401,7 +401,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentCourses");
+                    b.ToTable("StudentCourses", (string)null);
                 });
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.Video", b =>
@@ -446,7 +446,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Videos");
+                    b.ToTable("Videos", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -584,7 +584,7 @@ namespace learningManagementSystem.DAL.Migrations
 
             modelBuilder.Entity("learningManagementSystem.DAL.Models.ApplicationUser", b =>
                 {
-                    b.OwnsOne("learningManagementSystem.DAL.Models.Address", "Address", b1 =>
+                    b.OwnsOne("learningManagementSystem.DAL.Models.ApplicationUser.Address#learningManagementSystem.DAL.Models.Address", "Address", b1 =>
                         {
                             b1.Property<string>("ApplicationUserId")
                                 .HasColumnType("nvarchar(450)");
@@ -611,7 +611,7 @@ namespace learningManagementSystem.DAL.Migrations
 
                             b1.HasKey("ApplicationUserId");
 
-                            b1.ToTable("AspNetUsers");
+                            b1.ToTable("AspNetUsers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ApplicationUserId");

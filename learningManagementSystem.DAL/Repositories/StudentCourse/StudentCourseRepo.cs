@@ -104,6 +104,16 @@ public class StudentCourseRepo : GenericRepo<StudentCourse>, IStudentCourseRepo
 		}
 	}
 
+	public async Task<StudentCourse> GetByStudentIdAndCourseIdAsync(Guid courseId, Guid studentId)
+	{
+		return await _context.StudentCourses.FirstOrDefaultAsync(SC => SC.CourseId == courseId && SC.StudentId == studentId) ?? null!;
+	}
+
+	public async Task<IEnumerable<StudentCourse>> CheckIfThereAreStudentsOrNotAsync(Guid courseId)
+	{
+		return await _context.StudentCourses.Where(sc => sc.CourseId == courseId).ToListAsync();
+	}
+
 	//> Enroll User to course => Handle in BLL layer by Create method which in Generic repo
 	//> Out User from course => Handle in BLL layer by Delete method which in Generic repo
 }

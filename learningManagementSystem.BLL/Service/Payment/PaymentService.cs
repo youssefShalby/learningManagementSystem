@@ -143,6 +143,24 @@ public class PaymentService : IPaymentService
 			return null!;
 		}
 
+		//> get student to enroll it into course
+		var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(user.Id);
+		if(student is not null)
+		{
+			//> enroll user to course
+			var newEnroll = new StudentCourse
+			{
+				AssignedAt = DateTime.Now,
+				CourseId = course.Id,
+				StudentId = student.Id,
+			};
+
+			await _unitOfWork.StudentCourseRepo.CreateAsync(newEnroll);
+			await _unitOfWork.StudentCourseRepo.SaveChangesAsync();
+		}
+
+		
+
 		await _unitOfWork.CourseRepo.UnlockCourseVideosAsync(course.Id);
 		int studentsNumber =  _unitOfWork.StudentCourseRepo.GetStudentsNumber(course.Id);
 

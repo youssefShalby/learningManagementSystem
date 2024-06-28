@@ -49,6 +49,12 @@ public class CourseService : ICourseService
 
 		try
 		{
+			var studentCourses = await _unitOfWork.StudentCourseRepo.CheckIfThereAreStudentsOrNotAsync(courseToDelete.Id);
+			if (studentCourses.Any())
+			{
+				return new CommonResponse("cannot delete course because there are students subscribed to it..!", false);
+			}
+
 			_unitOfWork.CourseRepo.Delete(courseToDelete);
 			_unitOfWork.CourseRepo.SaveChanges();
 			return new CommonResponse("course deleted..!!", true);
@@ -129,6 +135,12 @@ public class CourseService : ICourseService
 
 		try
 		{
+			var studentCourses = await _unitOfWork.StudentCourseRepo.CheckIfThereAreStudentsOrNotAsync(courseToDelete.Id);
+			if (studentCourses.Any())
+			{
+				return new CommonResponse("cannot delete course because there are students subscribed to it..!", false);
+			}
+
 			courseToDelete.IsDeleted = true;
 			_unitOfWork.CourseRepo.Update(courseToDelete);
 			_unitOfWork.CourseRepo.SaveChanges();
@@ -224,5 +236,53 @@ public class CourseService : ICourseService
 	public int GetCoursesCount()
 	{
 		return _unitOfWork.CourseRepo.GetCoursesCount();
+	}
+
+	public async Task<CommonResponse> EnrollStudentToCourseAsync(EnrollStudentToCourseDto model)
+	{
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(model.Email);
+		if(user is null)
+		{
+			return new CommonResponse("user not founded..!!", false);
+		}
+
+		var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(user.Id);
+		if(student is null)
+		{
+			return new CommonResponse("cannot find student..!!", false);
+		}
+
+		var newEnroll = new StudentCourse
+		{
+			AssignedAt = DateTime.Now,
+			CourseId = model.CourseId,
+			StudentId = student.Id,
+		};
+
+		await _unitOfWork.StudentCourseRepo.CreateAsync(newEnroll);
+		await _unitOfWork.StudentCourseRepo.SaveChangesAsync();
+		return new CommonResponse("student enrolled..!!", true);
+	}
+
+	public async Task<CommonResponse> OutStudentFromCourseAsync(OutUserFromCourseDto model)
+	{
+		var user = await _unitOfWork.UserManager.FindByEmailAsync(model.Email);
+		if (user is null)
+		{
+			return new CommonResponse("user not founded..!!", false);
+		}
+
+		var student = await _unitOfWork.StudentRepo.GetByRefIdAsync(user.Id);
+		if (student is null)
+		{
+			return new CommonResponse("cannot find student..!!", false);
+		}
+
+		var studentCourse = await _unitOfWork.StudentCourseRepo.GetByStudentIdAndCourseIdAsync(model.CourseId, student.Id);
+
+		_unitOfWork.StudentCourseRepo.Delete(studentCourse);
+		_unitOfWork.CourseRepo.SaveChanges();
+
+		return new CommonResponse("the student now out from course..!!", true);
 	}
 }

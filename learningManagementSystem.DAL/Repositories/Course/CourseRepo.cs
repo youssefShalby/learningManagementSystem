@@ -173,6 +173,13 @@ public class CourseRepo : GenericRepo<Course>, ICourseRepo
 		}
 	}
 
+	public async Task DeleteInstrutorCourses(Guid instructorId)
+	{
+		var courses = await _context.Courses.Where(c => c.InstructorId == instructorId).ToListAsync();
+		DeleteRange(courses);
+		SaveChanges();
+	}
+
 	public bool IsInstructorOfCourse(Guid userId, Guid courseId)
 	{
 		return  _context.Courses.Any(c => c.Id == courseId && c.InstructorId == userId);

@@ -89,6 +89,31 @@ public class CoursesController : ControllerBase
 		return Ok(result);
 	}
 
+	[HttpPost("EnrollStudent")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> EnrollStudent(EnrollStudentToCourseDto model)
+	{
+		var result = await _courseService.EnrollStudentToCourseAsync(model);
+		if (!result.IsSuccessed)
+		{
+			return BadRequest(result);
+		}
+		return Ok(result);
+	}
+
+
+	[HttpPost("OutStudent")]
+	[Authorize(policy: "Instructor")]
+	public async Task<ActionResult> OutStudent(OutUserFromCourseDto model)
+	{
+		var result = await _courseService.OutStudentFromCourseAsync(model);
+		if (!result.IsSuccessed)
+		{
+			return BadRequest(result);
+		}
+		return Ok(result);
+	}
+
 	[HttpPost]
 	[Authorize(policy: "Instructor")]
 	public async Task<ActionResult> Create(CreateCourseDto model)
