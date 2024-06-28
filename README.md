@@ -92,4 +92,12 @@ A user with the Student role can perform the following operations:
 - Delete and edit their own comments.
 - Access all courses they have paid for.
 
-  
+---
+
+## Course Purshase Success Email
+![](Pictures/CoursePaymentEmail.png)
+
+---
+
+## System UML Design
+![](Pictures/LMS-UML.drawio.png)
